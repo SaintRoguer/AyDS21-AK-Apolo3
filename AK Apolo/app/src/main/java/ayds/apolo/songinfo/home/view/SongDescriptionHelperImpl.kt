@@ -40,9 +40,8 @@ internal class SongDescriptionHelperImpl : SongDescriptionHelper {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun day(releaseDate :String): String {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/uuuu")
-        return releaseDate.format(formatter)
-
+        val dateYearMonthDay = releaseDate.split("-").toTypedArray()
+        return dateYearMonthDay[2]+"/"+dateYearMonthDay[1]+"/"+dateYearMonthDay[0]
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun month(releaseDate :String): String {
