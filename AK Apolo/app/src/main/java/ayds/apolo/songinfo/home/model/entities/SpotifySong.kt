@@ -22,9 +22,7 @@ data class SpotifySong(
   override val imageUrl: String,
   override val releaseDatePrecision: String,
   override var isLocallyStoraged: Boolean = false
-) : Song {
-    
-}
+) : Song
 
 object EmptySong : Song {
     override val id: String = ""
