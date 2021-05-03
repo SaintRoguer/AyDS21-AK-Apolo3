@@ -23,7 +23,7 @@ data class SpotifySong(
   override val releaseDatePrecision: String,
   override var isLocallyStoraged: Boolean = false
 ) : Song {
-    val releaseDateModified: String = releaseDate.split("-").first()
+    
 }
 
 object EmptySong : Song {
