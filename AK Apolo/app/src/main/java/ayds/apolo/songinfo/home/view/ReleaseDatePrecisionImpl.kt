@@ -7,13 +7,13 @@ import ayds.apolo.songinfo.home.model.entities.Song
 import ayds.apolo.songinfo.home.model.entities.SpotifySong
 import java.util.*
 
-interface ReleaseDatePrecision {
+interface SongToReleaseDateStringMapper {
 
-    fun parsingDateWithPrecision(precision: String, releaseDate: String) : String
+    fun map(precision: String, releaseDate: String) : String
 }
 
-internal class ReleaseDatePrecisionImpl : ReleaseDatePrecision{
-    override fun parsingDateWithPrecision(precision: String, releaseDate: String) : String{
+internal class ReleaseDatePrecisionImpl : SongToReleaseDateStringMapper{
+    override fun map(precision: String, releaseDate: String) : String{
         val dateYearMonthDay = releaseDate.split("-")
         return when {
             precision == "day" && checkReleaseDateDay(dateYearMonthDay) -> getDayPrecision(dateYearMonthDay)

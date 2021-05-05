@@ -22,7 +22,7 @@ internal class SongDescriptionHelperImpl(private val dateFormatter : ReleaseDate
                 } \n" +
                         "Artist: ${song.artistName}  \n" +
                         "Album: ${song.albumName}  \n" +
-                        "Release Date: ${dateFormatter.parsingDateWithPrecision(song.releaseDatePrecision, song.releaseDate)}\n "
+                        "Release Date: ${dateFormatter.map(song.releaseDatePrecision, song.releaseDate)}\n "
 
             else -> "Song not found"
         }
