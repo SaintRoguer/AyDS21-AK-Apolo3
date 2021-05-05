@@ -68,15 +68,6 @@ internal class ReleaseDatePrecisionImpl : ReleaseDatePrecision{
         return if(!res_isLeap) year + " (not a leap year)" else year
     }
 
-    private fun isLeapYear(year: Int): Boolean = when {
-        year % 4 == 0 -> {
-            when {
-                year % 100 == 0 -> year % 400 == 0
-                else -> true
-            }
-        }
-        else -> false
-    }
-
+    private fun isLeapYear(year: Int) = (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0))
 
 }
