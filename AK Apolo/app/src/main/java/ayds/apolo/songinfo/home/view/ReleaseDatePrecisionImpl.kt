@@ -59,7 +59,7 @@ internal class ReleaseDatePrecisionImpl : ReleaseDatePrecision{
                 "10" -> "October"
                 "11" -> "November"
                 "12" -> "December"
-                else -> null
+                else -> throw IllegalArgumentException(numberMonth)
             }
 
     private  fun getYearPrecision(dateYearMonthDay: List<String>): String {
