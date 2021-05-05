@@ -19,7 +19,7 @@ internal class ReleaseDatePrecisionImpl : ReleaseDatePrecision{
             precision == "day" && checkReleaseDateDay(dateYearMonthDay) -> getDayPrecision(dateYearMonthDay)
             precision == "month" && checkReleaseDateMonth(dateYearMonthDay) -> getMonthPrecision(dateYearMonthDay)
             precision == "year" && checkReleaseDateYear(dateYearMonthDay) -> getYearPrecision(dateYearMonthDay)
-            else -> return "An error has occurred when modifying the format of the release date"
+            else -> return releaseDate
         }
     }
 
