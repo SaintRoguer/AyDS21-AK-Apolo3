@@ -1,11 +1,10 @@
 package ayds.apolo.songinfo.home.view
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+
 import ayds.apolo.songinfo.home.model.entities.EmptySong
 import ayds.apolo.songinfo.home.model.entities.Song
 import ayds.apolo.songinfo.home.model.entities.SpotifySong
-import java.util.*
+
 
 interface SongDescriptionHelper {
 
