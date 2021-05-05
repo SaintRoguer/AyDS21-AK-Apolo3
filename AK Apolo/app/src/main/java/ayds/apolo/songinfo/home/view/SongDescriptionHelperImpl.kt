@@ -7,7 +7,6 @@ import ayds.apolo.songinfo.home.model.entities.SpotifySong
 
 
 interface SongDescriptionHelper {
-
     fun getSongDescriptionText(song: Song = EmptySong): String
 }
 
