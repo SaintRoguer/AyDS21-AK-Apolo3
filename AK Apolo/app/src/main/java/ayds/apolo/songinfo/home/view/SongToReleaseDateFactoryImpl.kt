@@ -13,6 +13,6 @@ internal class SongToReleaseDateFactoryImpl : SongToReleaseDateFactory{
             "day" -> SongToDayReleaseDateStringMapper(song)
             "month" -> SongToMonthReleaseDateStringMapper(song)
             "year" -> SongToYearReleaseDateStringMapper(song)
-            else -> SongReleaseDateNotFound()
+            else -> SongReleaseDateNotFound(song)
         }
 }

@@ -9,12 +9,16 @@ interface SongToReleaseDateStringMapper {
 
 internal class SongToDayReleaseDateStringMapper (private val song: Song) : SongToReleaseDateStringMapper{
 
-    private fun getDayPrecision(dateYearMonthDay : List<String>): String {
-        return dateYearMonthDay[2] + "/" + dateYearMonthDay[1] + "/" + dateYearMonthDay[0]
+    private fun getDayPrecision(releaseDate : String): String {
+        val dateYearMonthDay = releaseDate.split("-")
+        val day = dateYearMonthDay[2]
+        val month = dateYearMonthDay[1]
+        val year = dateYearMonthDay[0]
+        return "$day/$month/$year"
     }
 
     override fun map(): String {
-        return getDayPrecision(song.releaseDate.split("-"))
+        return getDayPrecision(song.releaseDate)
     }
 }
 
@@ -37,12 +41,16 @@ internal class SongToMonthReleaseDateStringMapper (private val song: Song) : Son
             else -> throw IllegalArgumentException(numberMonth)
         }
 
-    private fun getMonthPrecision(dateYearMonthDay : List<String>): String {
-        return getStringMonth(dateYearMonthDay[1]) + ", " + dateYearMonthDay[0]
+    private fun getMonthPrecision(releaseDate : String): String {
+        val dateYearMonth = releaseDate.split("-")
+        val monthNumber = dateYearMonth[1]
+        val monthName = getStringMonth(monthNumber)
+        val year = dateYearMonth[0]
+        return "$monthName,$year"
     }
 
     override fun map(): String {
-        return getMonthPrecision(song.releaseDate.split("-"))
+        return getMonthPrecision(song.releaseDate)
     }
 }
 
@@ -50,20 +58,21 @@ internal class SongToYearReleaseDateStringMapper (private val song: Song) : Song
 
     private fun isLeapYear(year: Int) = (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0))
 
-    private  fun getYearPrecision(dateYearMonthDay: List<String>): String {
-        val year = dateYearMonthDay[0]
-        val res_isLeap = isLeapYear(year.toInt())
-        return if(!res_isLeap) year + " (not a leap year)" else year
+    private  fun getYearPrecision(year : String): String {
+        return when(isLeapYear(year.toInt())) {
+            false -> "$year (not a leap year)"
+            else -> year
+        }
     }
 
     override fun map(): String {
-        return getYearPrecision(song.releaseDate.split("-"))
+        return getYearPrecision(song.releaseDate)
     }
 }
 
-internal class SongReleaseDateNotFound : SongToReleaseDateStringMapper{
+internal class SongReleaseDateNotFound (private val song: Song): SongToReleaseDateStringMapper{
 
     override fun map(): String {
-        return "--/--/----"
+        return song.releaseDate
     }
 }
