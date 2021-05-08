@@ -30,7 +30,7 @@ class OtherInfoWindow : AppCompatActivity() {
         open(intent.getStringExtra("artistName"))
     }
 
-    fun getARtistInfo(artistName: String?) {
+    private fun getARtistInfo(artistName: String?) {
 
         // create
         val retrofit = Retrofit.Builder()
