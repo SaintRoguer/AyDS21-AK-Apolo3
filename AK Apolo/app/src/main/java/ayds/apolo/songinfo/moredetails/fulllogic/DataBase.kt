@@ -2,7 +2,7 @@ package ayds.apolo.songinfo.moredetails.fulllogic
 
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase
-import ayds.apolo.songinfo.moredetails.fulllogic.DataBase
+import android.database.Cursor;
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
@@ -15,8 +15,8 @@ import java.util.ArrayList
 class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            "create table artists (id INTEGER PRIMARY KEY AUTOINCREMENT, artist string, info string, source integer)")
+        val createTable = "create table artists (id INTEGER PRIMARY KEY AUTOINCREMENT, artist string, info string, source integer)"
+        db.execSQL(createTable)
         Log.i("DB", "DB created")
     }
 
@@ -30,7 +30,7 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             try {
                 DatabaseConnection = DriverManager.getConnection("jdbc:sqlite:./dictionary.db")
                 val resulSet=createStatement(DatabaseConnection)
-                FillDatabase(resulSet)
+                fillDatabase(resulSet)
             } catch (e: SQLException) {
                 // Tener en cuenta que si no se dispone del espacio suficiente,
                 // no se crea la base de datos y tira la excepcion
@@ -51,7 +51,7 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             return resultSet
         }
 
-        private fun FillDatabase(resultSet: java.sql.ResultSet) {
+        private fun fillDatabase(resultSet: java.sql.ResultSet) {
             while (resultSet.next()) {
                 println("id = " + resultSet.getInt("id"))
                 println("artist = " + resultSet.getString("artist"))
@@ -62,14 +62,12 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
         @JvmStatic
         fun saveArtist(dbHelper: DataBase, artist: String?, info: String?) {
-            val MutableDatabase = dbHelper.writableDatabase
-
-            val databaseNewColumn= ContentValues()
-            FillDatabaseWithNewColumn(databaseNewColumn,artist,info)
-            MutableDatabase.insert("artists", null, databaseNewColumn)
+            val mutableDatabase = dbHelper.writableDatabase
+            fillDatabaseWithNewColumn(ContentValues(),artist,info)
+            mutableDatabase.insert("artists", null, ContentValues())
         }
 
-        private fun FillDatabaseWithNewColumn(databaseNewColumn:ContentValues,artist:String?,info:String?){
+        private fun fillDatabaseWithNewColumn(databaseNewColumn:ContentValues, artist:String?, info:String?){
             databaseNewColumn.put("artist", artist)
             databaseNewColumn.put("info", info)
             databaseNewColumn.put("source", 1)
@@ -77,40 +75,43 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
         @JvmStatic
         fun getInfo(dbHelper: DataBase, artist: String): String? {
+            val cursor = newArtistCursor(dbHelper,artist)
+            val items = getArtistItems(dbHelper,artist,cursor)
+            cursor.close()
+            return when {
+                items.isEmpty() -> null
+                else -> items[0]
+            }
+        }
+
+        private fun newArtistCursor(dbHelper: DataBase, artist: String) : Cursor {
             val db = dbHelper.readableDatabase
-
-// Define a projection that specifies which columns from the database
-// you will actually use after this query.
-            val projection = arrayOf(
-                "id",
-                "artist",
-                "info"
-            )
-
-// Filter results WHERE "title" = 'My Title'
+            val projection = arrayOf("id","artist","info")
             val selection = "artist  = ?"
             val selectionArgs = arrayOf(artist)
-
-// How you want the results sorted in the resulting Cursor
             val sortOrder = "artist DESC"
-            val cursor = db.query(
-                "artists",  // The table to query
-                projection,  // The array of columns to return (pass null to get all)
-                selection,  // The columns for the WHERE clause
-                selectionArgs,  // The values for the WHERE clause
-                null,  // don't group the rows
-                null,  // don't filter by row groups
-                sortOrder // The sort order
+            return db.query(
+                "artists",
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
             )
-            val items: MutableList<String> = ArrayList()
+        }
+
+        private fun getArtistItems(dbHelper: DataBase, artist: String, cursor : Cursor) : MutableList<String> {
+            var items: MutableList<String>  = ArrayList()
             while (cursor.moveToNext()) {
                 val info = cursor.getString(
                     cursor.getColumnIndexOrThrow("info"))
                 items.add(info)
             }
-            cursor.close()
-            return if (items.isEmpty()) null else items[0]
+            return items
         }
+
+
     }
 
 }
