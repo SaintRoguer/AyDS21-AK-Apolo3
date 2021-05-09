@@ -2,12 +2,14 @@ package ayds.apolo.songinfo.moredetails.fulllogic
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import ayds.apolo.songinfo.R
 import com.google.gson.Gson
@@ -24,6 +26,7 @@ class OtherInfoWindow : AppCompatActivity() {
     private var moreDetailsPane: TextView? = null
     private var dataBase: DataBase? = null
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
@@ -31,6 +34,7 @@ class OtherInfoWindow : AppCompatActivity() {
         getInfoMoreDetailsPane(intent.getStringExtra("artistName"))
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun getInfoMoreDetailsPane(artistName: String?) {
         dataBase = DataBase(this)
         when(dataBase){
@@ -49,6 +53,7 @@ class OtherInfoWindow : AppCompatActivity() {
 
     private fun bioContentToHTML(bioContent: JsonElement, artistName: String) : String {
         var moreDetailsDescription: String
+        Log.e("TAG", "Error $bioContent")
         if (bioContent == null) {
             moreDetailsDescription = "No Results"
         } else {
@@ -94,6 +99,7 @@ class OtherInfoWindow : AppCompatActivity() {
         return infoFromJsonBioContentAndUrl
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun getArtistInfo(artistName: String?) {
         val lastFMAPI = adaptJInterfaceToHTTP()
 
@@ -108,7 +114,7 @@ class OtherInfoWindow : AppCompatActivity() {
                 val bioContentAndUrl = parseFromJson(callResponse)
                 val bioContent= bioContentAndUrl[0]
                 val url= bioContentAndUrl[1]
-                bioContentToHTML(bioContent, artistName)
+                moreDetailsDescription = bioContentToHTML(bioContent, artistName)
                 setURLButtonListener(url)
             }
             val apiImageUrl =
@@ -116,7 +122,7 @@ class OtherInfoWindow : AppCompatActivity() {
             Log.e("TAG", "Get Image from $apiImageUrl")
             runOnUiThread {
                 Picasso.get().load(apiImageUrl).into(findViewById<View>(R.id.imageView) as ImageView)
-                moreDetailsPane!!.text = Html.fromHtml(moreDetailsDescription)
+                moreDetailsPane!!.text = Html.fromHtml(moreDetailsDescription,0)
             }
         }.start()
     }
