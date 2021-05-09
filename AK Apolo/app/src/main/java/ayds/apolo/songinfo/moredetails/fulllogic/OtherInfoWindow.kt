@@ -33,6 +33,10 @@ class OtherInfoWindow : AppCompatActivity() {
 
     private fun getInfoMoreDetailsPane(artistName: String?) {
         dataBase = DataBase(this)
+        when(dataBase){
+            null -> print("Nulo")
+            else -> print("No nulo")
+        }
         getArtistInfo(artistName)
     }
 

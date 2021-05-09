@@ -46,7 +46,6 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             return DriverManager.getConnection("jdbc:sqlite:./dictionary.db")
         }
 
-
         private fun initializeDatabase(DatabaseConnection: Connection?) {
             val statement = DatabaseConnection?.createStatement()
             if (statement != null) {
@@ -64,24 +63,19 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             }
         }
 
-        @JvmStatic
-        fun saveArtist(dbHelper: DataBase, artist: String?, info: String?) {
+        fun saveArtist(dbHelper: DataBase, artist: String, info: String) {
             val databaseToModify = dbHelper.writableDatabase
-            fillDatabaseWithNewColumn(ContentValues(), artist, info)
-            databaseToModify.insert("artists", null, ContentValues())
+            val databaseNewRow = ContentValues()
+            fillDatabaseWithNewRow(databaseNewRow, artist, info)
+            databaseToModify.insert("artists", null, databaseNewRow)
         }
 
-        private fun fillDatabaseWithNewColumn(
-            databaseNewColumn: ContentValues,
-            artist: String?,
-            info: String?
-        ) {
+        private fun fillDatabaseWithNewRow(databaseNewColumn: ContentValues,artist: String,info: String){
             databaseNewColumn.put("artist", artist)
             databaseNewColumn.put("info", info)
             databaseNewColumn.put("source", 1)
         }
 
-        @JvmStatic
         fun getInfo(dbHelper: DataBase, artist: String): String? {
             val cursor: Cursor = newArtistCursor(dbHelper, artist)
             val items = getArtistItems(cursor)
