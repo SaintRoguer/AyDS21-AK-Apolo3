@@ -42,6 +42,9 @@ class OtherInfoWindow : AppCompatActivity() {
             .build()
             .create(LastFMAPI::class.java)
 
+    //Estamos devolviendo algo de tipo string y despues no lo usamos, somos unos pajeros
+    //Y el nombre de la funcion esta mal, deberiamos hacer una funcion de guardado en la base de datos
+    //saveInfoForDataBase() deberia llamarse o algo asi
     private fun extractToHTML(extract: JsonElement, artistName: String) : String {
         var moreDetailsDescription: String
         if (extract == null) {
