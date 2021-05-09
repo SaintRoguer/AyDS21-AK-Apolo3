@@ -65,7 +65,7 @@ class OtherInfoWindow : AppCompatActivity() {
         }
     }
 
-    private fun getJsonFromService(lastFMAPI: LastFMAPI, artistName: String) : Response<String>{
+    private fun getResponseFromService(lastFMAPI: LastFMAPI, artistName: String) : Response<String>{
         lateinit var  callResponse: Response<String>
         try {
             callResponse = lastFMAPI.getArtistInfo(artistName).execute()
@@ -100,7 +100,7 @@ class OtherInfoWindow : AppCompatActivity() {
             if (moreDetailsDescription != null)// exists in db
                 moreDetailsDescription = "[*]$moreDetailsDescription"
             else { // get from service
-                val callResponse = getJsonFromService(lastFMAPI,artistName)
+                val callResponse = getResponseFromService(lastFMAPI,artistName)
                 val bioContentAndUrl = parseFromJson(callResponse)
                 val bioContent= bioContentAndUrl[0]
                 val url= bioContentAndUrl[1]
