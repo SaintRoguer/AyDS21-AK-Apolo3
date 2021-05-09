@@ -2,7 +2,7 @@ package ayds.apolo.songinfo.moredetails.fulllogic
 
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase
-import android.database.Cursor;
+import android.database.Cursor
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
@@ -24,25 +24,25 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
 
     companion object {
-        const val TimeOutInSec = 30
+        private const val TimeOutInSec = 30
 
         fun createDatabase() {
-            var DatabaseConnection: Connection? = null
+            var databaseConnection: Connection? = null
             try {
-                DatabaseConnection = getConnection()
-                initializeDatabase(DatabaseConnection)
+                databaseConnection = getConnection()
+                initializeDatabase(databaseConnection)
             } catch (e: SQLException) {
                 System.err.println(e.message)
             } finally {
                 try {
-                    DatabaseConnection?.close()
+                    databaseConnection?.close()
                 } catch (e: SQLException) {
                     System.err.println(e)
                 }
             }
         }
 
-        fun getConnection(): Connection {
+        private fun getConnection(): Connection {
             return DriverManager.getConnection("jdbc:sqlite:./dictionary.db")
         }
 
@@ -83,8 +83,8 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
         @JvmStatic
         fun getInfo(dbHelper: DataBase, artist: String): String? {
-            val cursor = newArtistCursor(dbHelper, artist)
-            val items = getArtistItems(dbHelper, artist, cursor)
+            val cursor: Cursor = newArtistCursor(dbHelper, artist)
+            val items = getArtistItems(cursor)
             cursor.close()
             return when {
                 items.isEmpty() -> null
@@ -109,16 +109,11 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             )
         }
 
-        private fun getArtistItems(
-            dbHelper: DataBase,
-            artist: String,
-            cursor: Cursor
-        ): MutableList<String> {
-            var items: MutableList<String> = ArrayList()
+        private fun getArtistItems(cursor: Cursor): MutableList<String> {
+            val items = ArrayList<String>()
             while (cursor.moveToNext()) {
-                val info = cursor.getString(
-                    cursor.getColumnIndexOrThrow("info")
-                )
+                val columnIndex = cursor.getColumnIndexOrThrow("info")
+                val info = cursor.getString(columnIndex)
                 items.add(info)
             }
             return items
