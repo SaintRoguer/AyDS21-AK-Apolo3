@@ -8,32 +8,30 @@ import android.content.Context
 import android.util.Log
 import java.sql.Connection
 import java.sql.DriverManager
-import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.ArrayList
 
 class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTable = "create table artists (id INTEGER PRIMARY KEY AUTOINCREMENT, artist string, info string, source integer)"
+        val createTable =
+            "create table artists (id INTEGER PRIMARY KEY AUTOINCREMENT, artist string, info string, source integer)"
         db.execSQL(createTable)
         Log.i("DB", "DB created")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
 
+
     companion object {
         const val TimeOutInSec = 30
 
-        fun generateDatabase() {
+        fun createDatabase() {
             var DatabaseConnection: Connection? = null
             try {
-                DatabaseConnection = DriverManager.getConnection("jdbc:sqlite:./dictionary.db")
-                val resulSet=createStatement(DatabaseConnection)
-                fillDatabase(resulSet)
+                DatabaseConnection = getConnection()
+                initializeDatabase(DatabaseConnection)
             } catch (e: SQLException) {
-                // Tener en cuenta que si no se dispone del espacio suficiente,
-                // no se crea la base de datos y tira la excepcion
                 System.err.println(e.message)
             } finally {
                 try {
@@ -44,11 +42,15 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             }
         }
 
-        private fun createStatement(DatabaseConnection: Connection): ResultSet {
+        fun getConnection(): Connection {
+            return DriverManager.getConnection("jdbc:sqlite:./dictionary.db")
+        }
+
+
+        private fun initializeDatabase(DatabaseConnection: Connection?) {
             val statement = DatabaseConnection.createStatement()
-            statement.queryTimeout = DataBase.TimeOutInSec
-            val resultSet = statement.executeQuery("select * from artists")
-            return resultSet
+            statement.queryTimeout = TimeOutInSec
+            fillDatabase(resultSet = statement.executeQuery("select * from artists"))
         }
 
         private fun fillDatabase(resultSet: java.sql.ResultSet) {
@@ -62,12 +64,16 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
         @JvmStatic
         fun saveArtist(dbHelper: DataBase, artist: String?, info: String?) {
-            val mutableDatabase = dbHelper.writableDatabase
-            fillDatabaseWithNewColumn(ContentValues(),artist,info)
-            mutableDatabase.insert("artists", null, ContentValues())
+            val databaseToModify = dbHelper.writableDatabase
+            fillDatabaseWithNewColumn(ContentValues(), artist, info)
+            databaseToModify.insert("artists", null, ContentValues())
         }
 
-        private fun fillDatabaseWithNewColumn(databaseNewColumn:ContentValues, artist:String?, info:String?){
+        private fun fillDatabaseWithNewColumn(
+            databaseNewColumn: ContentValues,
+            artist: String?,
+            info: String?
+        ) {
             databaseNewColumn.put("artist", artist)
             databaseNewColumn.put("info", info)
             databaseNewColumn.put("source", 1)
@@ -75,8 +81,8 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
         @JvmStatic
         fun getInfo(dbHelper: DataBase, artist: String): String? {
-            val cursor = newArtistCursor(dbHelper,artist)
-            val items = getArtistItems(dbHelper,artist,cursor)
+            val cursor = newArtistCursor(dbHelper, artist)
+            val items = getArtistItems(dbHelper, artist, cursor)
             cursor.close()
             return when {
                 items.isEmpty() -> null
@@ -84,9 +90,9 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             }
         }
 
-        private fun newArtistCursor(dbHelper: DataBase, artist: String) : Cursor {
+        private fun newArtistCursor(dbHelper: DataBase, artist: String): Cursor {
             val db = dbHelper.readableDatabase
-            val projection = arrayOf("id","artist","info")
+            val projection = arrayOf("id", "artist", "info")
             val selection = "artist  = ?"
             val selectionArgs = arrayOf(artist)
             val sortOrder = "artist DESC"
@@ -101,11 +107,16 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
             )
         }
 
-        private fun getArtistItems(dbHelper: DataBase, artist: String, cursor : Cursor) : MutableList<String> {
-            var items: MutableList<String>  = ArrayList()
+        private fun getArtistItems(
+            dbHelper: DataBase,
+            artist: String,
+            cursor: Cursor
+        ): MutableList<String> {
+            var items: MutableList<String> = ArrayList()
             while (cursor.moveToNext()) {
                 val info = cursor.getString(
-                    cursor.getColumnIndexOrThrow("info"))
+                    cursor.getColumnIndexOrThrow("info")
+                )
                 items.add(info)
             }
             return items
