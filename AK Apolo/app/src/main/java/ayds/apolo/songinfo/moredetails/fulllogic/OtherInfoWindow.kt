@@ -42,12 +42,12 @@ class OtherInfoWindow : AppCompatActivity() {
             .build()
             .create(LastFMAPI::class.java)
 
-    private fun extractToHTML(extract: JsonElement, artistName: String) : String {
+    private fun bioContentToHTML(bioContent: JsonElement, artistName: String) : String {
         var moreDetailsDescription: String
-        if (extract == null) {
+        if (bioContent == null) {
             moreDetailsDescription = "No Results"
         } else {
-            moreDetailsDescription = extract.asString.replace("\\n", "\n")
+            moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
             moreDetailsDescription = textToHtml(moreDetailsDescription, artistName)
             // save to DB  <o/
             DataBase.saveArtist(dataBase!!, artistName, moreDetailsDescription)
@@ -55,36 +55,38 @@ class OtherInfoWindow : AppCompatActivity() {
         return moreDetailsDescription
     }
 
-    private fun linkToURLButton(url: JsonElement) {
+    private fun setURLButtonListener(url: JsonElement) {
         val urlString = url.asString
         findViewById<View>(R.id.openUrlButton).setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(urlString)
-            startActivity(intent)
+            val openUrlAction = Intent(Intent.ACTION_VIEW)
+            openUrlAction.data = Uri.parse(urlString)
+            startActivity(openUrlAction)
         }
     }
 
-    private fun getInfoFromService(lastFMAPI: LastFMAPI, artistName: String) : List<JsonElement>{
-        val callResponse: Response<String>
-        val infoFromJsonExtractAndUrl = mutableListOf<JsonElement>()
+    private fun getJsonFromService(lastFMAPI: LastFMAPI, artistName: String) : Response<String>{
+        lateinit var  callResponse: Response<String>
         try {
             callResponse = lastFMAPI.getArtistInfo(artistName).execute()
             Log.e("TAG", "JSON " + callResponse.body())
-            val gson = Gson()
-            val jobj = gson.fromJson(callResponse.body(), JsonObject::class.java)
-            val artist = jobj["artist"].asJsonObject
-            val bio = artist["bio"].asJsonObject
-            val extract = bio["content"]
-            val url = artist["url"]
-            infoFromJsonExtractAndUrl.add(extract)
-            infoFromJsonExtractAndUrl.add(url)
-
         } catch (e1: IOException) {
             Log.e("TAG", "Error $e1")
             e1.printStackTrace()
         }
+        return callResponse
+    }
 
-        return infoFromJsonExtractAndUrl
+    private fun parseFromJson(callResponse:Response<String>) :List<JsonElement>{
+        val infoFromJsonBioContentAndUrl = mutableListOf<JsonElement>()
+        val gson = Gson()
+        val jObj = gson.fromJson(callResponse.body(), JsonObject::class.java)
+        val artist = jObj["artist"].asJsonObject
+        val bio = artist["bio"].asJsonObject
+        val bioContent = bio["content"]
+        val artistUrl = artist["url"]
+        infoFromJsonBioContentAndUrl.add(bioContent)
+        infoFromJsonBioContentAndUrl.add(artistUrl)
+        return infoFromJsonBioContentAndUrl
     }
 
     private fun getArtistInfo(artistName: String?) {
@@ -94,24 +96,22 @@ class OtherInfoWindow : AppCompatActivity() {
 
         Thread {
             var moreDetailsDescription = DataBase.getInfo(dataBase!!, artistName!!)
-
             if (moreDetailsDescription != null)// exists in db
                 moreDetailsDescription = "[*]$moreDetailsDescription"
             else { // get from service
-                val extractAndUrl = getInfoFromService(lastFMAPI, artistName)
-                val extract= extractAndUrl[0]
-                val url= extractAndUrl[1]
-                extractToHTML(extract, artistName)
-                linkToURLButton(url)
-
+                val callResponse = getJsonFromService(lastFMAPI,artistName)
+                val bioContentAndUrl = parseFromJson(callResponse)
+                val bioContent= bioContentAndUrl[0]
+                val url= bioContentAndUrl[1]
+                bioContentToHTML(bioContent, artistName)
+                setURLButtonListener(url)
             }
-            val imageUrl =
+            val apiImageUrl =
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-            Log.e("TAG", "Get Image from $imageUrl")
-            val finalText = moreDetailsDescription
+            Log.e("TAG", "Get Image from $apiImageUrl")
             runOnUiThread {
-                Picasso.get().load(imageUrl).into(findViewById<View>(R.id.imageView) as ImageView)
-                moreDetailsPane!!.text = Html.fromHtml(finalText)
+                Picasso.get().load(apiImageUrl).into(findViewById<View>(R.id.imageView) as ImageView)
+                moreDetailsPane!!.text = Html.fromHtml(moreDetailsDescription)
             }
         }.start()
     }
