@@ -18,6 +18,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.IOException
+import java.util.*
 
 class OtherInfoWindow : AppCompatActivity() {
     private var moreDetailsPane: TextView? = null
@@ -125,7 +126,7 @@ class OtherInfoWindow : AppCompatActivity() {
             val textWithBold = text
                 .replace("'", " ")
                 .replace("\n", "<br>")
-                .replace("(?i)" + term!!.toRegex(), "<b>" + term.toUpperCase() + "</b>")
+                .replace("(?i)" + term!!.toRegex(), "<b>" + term.toUpperCase(Locale.getDefault()) + "</b>")
             builder.append(textWithBold)
             builder.append("</font></div></html>")
             return builder.toString()
