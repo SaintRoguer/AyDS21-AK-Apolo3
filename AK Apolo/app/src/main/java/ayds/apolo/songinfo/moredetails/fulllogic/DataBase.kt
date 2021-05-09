@@ -48,9 +48,11 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
 
 
         private fun initializeDatabase(DatabaseConnection: Connection?) {
-            val statement = DatabaseConnection.createStatement()
-            statement.queryTimeout = TimeOutInSec
-            fillDatabase(resultSet = statement.executeQuery("select * from artists"))
+            val statement = DatabaseConnection?.createStatement()
+            if (statement != null) {
+                statement.queryTimeout = TimeOutInSec
+            }
+            statement?.executeQuery("select * from artists")?.let { fillDatabase(resultSet = it) }
         }
 
         private fun fillDatabase(resultSet: java.sql.ResultSet) {
