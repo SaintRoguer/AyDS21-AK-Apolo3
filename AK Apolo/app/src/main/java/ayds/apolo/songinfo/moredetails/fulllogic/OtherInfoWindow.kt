@@ -23,10 +23,9 @@ import java.io.IOException
 import java.util.*
 
 class OtherInfoWindow : AppCompatActivity() {
-    private var moreDetailsPane: TextView? = null
-    private var dataBase: DataBase? = null
+    private lateinit var moreDetailsPane: TextView
+    private lateinit var dataBase: DataBase
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
@@ -34,13 +33,8 @@ class OtherInfoWindow : AppCompatActivity() {
         getInfoMoreDetailsPane(intent.getStringExtra("artistName"))
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun getInfoMoreDetailsPane(artistName: String?) {
         dataBase = DataBase(this)
-        when(dataBase){
-            null -> print("Nulo")
-            else -> print("No nulo")
-        }
         getArtistInfo(artistName)
     }
 
@@ -51,7 +45,7 @@ class OtherInfoWindow : AppCompatActivity() {
             .build()
             .create(LastFMAPI::class.java)
 
-    private fun bioContentToHTML(bioContent: JsonElement, artistName: String) : String {
+    private fun bioContentToHTML(bioContent: JsonElement?, artistName: String) : String {
         var moreDetailsDescription: String
         Log.e("TAG", "Error $bioContent")
         when (bioContent) {
@@ -61,8 +55,7 @@ class OtherInfoWindow : AppCompatActivity() {
             else -> {
                 moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
                 moreDetailsDescription = textToHtml(moreDetailsDescription, artistName)
-                // save to DB  <o/
-                DataBase.saveArtist(dataBase!!, artistName, moreDetailsDescription)
+                DataBase.saveArtist(dataBase, artistName, moreDetailsDescription)
             }
         }
         return moreDetailsDescription
@@ -102,14 +95,13 @@ class OtherInfoWindow : AppCompatActivity() {
         return infoFromJsonBioContentAndUrl
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun getArtistInfo(artistName: String?) {
         val lastFMAPI = adaptJInterfaceToHTTP()
 
         Log.e("TAG", "artistName $artistName")
 
         Thread {
-            var moreDetailsDescription = DataBase.getInfo(dataBase!!, artistName!!)
+            var moreDetailsDescription = DataBase.getInfo(dataBase, artistName!!)
             if (moreDetailsDescription != null)// exists in db
                 moreDetailsDescription = "[*]$moreDetailsDescription"
             else { // get from service
@@ -125,7 +117,7 @@ class OtherInfoWindow : AppCompatActivity() {
             Log.e("TAG", "Get Image from $apiImageUrl")
             runOnUiThread {
                 Picasso.get().load(apiImageUrl).into(findViewById<View>(R.id.imageView) as ImageView)
-                moreDetailsPane!!.text = Html.fromHtml(moreDetailsDescription,0)
+                moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
             }
         }.start()
     }
