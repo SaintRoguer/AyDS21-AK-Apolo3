@@ -47,7 +47,6 @@ class OtherInfoWindow : AppCompatActivity() {
 
     private fun bioContentToHTML(bioContent: JsonElement?, artistName: String) : String {
         var moreDetailsDescription: String
-        Log.e("TAG", "Error $bioContent")
         when (bioContent) {
             null -> {
                 moreDetailsDescription = "No Results"
@@ -74,9 +73,7 @@ class OtherInfoWindow : AppCompatActivity() {
         lateinit var  callResponse: Response<String>
         try {
             callResponse = lastFMAPI.getArtistInfo(artistName).execute()
-            Log.e("TAG", "JSON " + callResponse.body())
         } catch (e1: IOException) {
-            Log.e("TAG", "Error $e1")
             e1.printStackTrace()
         }
         return callResponse
@@ -97,9 +94,6 @@ class OtherInfoWindow : AppCompatActivity() {
 
     private fun getArtistInfo(artistName: String?) {
         val lastFMAPI = adaptJInterfaceToHTTP()
-
-        Log.e("TAG", "artistName $artistName")
-
         Thread {
             var moreDetailsDescription = DataBase.getInfo(dataBase, artistName!!)
             if (moreDetailsDescription != null)// exists in db
@@ -114,7 +108,6 @@ class OtherInfoWindow : AppCompatActivity() {
             }
             val apiImageUrl =
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-            Log.e("TAG", "Get Image from $apiImageUrl")
             runOnUiThread {
                 Picasso.get().load(apiImageUrl).into(findViewById<View>(R.id.imageView) as ImageView)
                 moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
