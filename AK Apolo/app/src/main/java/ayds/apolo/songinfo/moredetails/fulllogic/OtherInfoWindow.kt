@@ -54,13 +54,16 @@ class OtherInfoWindow : AppCompatActivity() {
     private fun bioContentToHTML(bioContent: JsonElement, artistName: String) : String {
         var moreDetailsDescription: String
         Log.e("TAG", "Error $bioContent")
-        if (bioContent == null) {
-            moreDetailsDescription = "No Results"
-        } else {
-            moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
-            moreDetailsDescription = textToHtml(moreDetailsDescription, artistName)
-            // save to DB  <o/
-            DataBase.saveArtist(dataBase!!, artistName, moreDetailsDescription)
+        when (bioContent) {
+            null -> {
+                moreDetailsDescription = "No Results"
+            }
+            else -> {
+                moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
+                moreDetailsDescription = textToHtml(moreDetailsDescription, artistName)
+                // save to DB  <o/
+                DataBase.saveArtist(dataBase!!, artistName, moreDetailsDescription)
+            }
         }
         return moreDetailsDescription
     }
