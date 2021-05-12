@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Html
 import android.util.Log
 import android.view.View
@@ -24,7 +25,7 @@ import java.util.*
 
 class OtherInfoWindow : AppCompatActivity() {
     private lateinit var moreDetailsPane: TextView
-    private lateinit var dataBase: DataBase
+    private lateinit var dataBase : DataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +55,7 @@ class OtherInfoWindow : AppCompatActivity() {
             else -> {
                 moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
                 moreDetailsDescription = textToHtml(moreDetailsDescription, artistName)
-                DataBase.saveArtist(dataBase, artistName, moreDetailsDescription)
+                dataBase.saveArtist(artistName, moreDetailsDescription)
             }
         }
         return moreDetailsDescription
@@ -95,7 +96,7 @@ class OtherInfoWindow : AppCompatActivity() {
     private fun getArtistInfo(artistName: String?) {
         val lastFMAPI = adaptJInterfaceToHTTP()
         Thread {
-            var moreDetailsDescription = DataBase.getInfo(dataBase, artistName!!)
+            var moreDetailsDescription = dataBase.getInfo(artistName!!)
             if (moreDetailsDescription != null)// exists in db
                 moreDetailsDescription = "[*]$moreDetailsDescription"
             else { // get from service
