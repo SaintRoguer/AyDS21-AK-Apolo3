@@ -2,15 +2,11 @@ package ayds.apolo.songinfo.moredetails.fulllogic
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.text.Html
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import ayds.apolo.songinfo.R
 import com.google.gson.Gson
@@ -25,7 +21,8 @@ import java.util.*
 
 class OtherInfoWindow : AppCompatActivity() {
     private lateinit var moreDetailsPane: TextView
-    private lateinit var dataBase : DataBase
+    private lateinit var dataBase: DataBase
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +43,7 @@ class OtherInfoWindow : AppCompatActivity() {
             .build()
             .create(LastFMAPI::class.java)
 
-    private fun bioContentToHTML(bioContent: JsonElement?, artistName: String) : String {
+    private fun bioContentToHTML(bioContent: JsonElement?, artistName: String): String {
         var moreDetailsDescription: String
         when (bioContent) {
             null -> {
@@ -70,8 +67,8 @@ class OtherInfoWindow : AppCompatActivity() {
         }
     }
 
-    private fun getResponseFromService(lastFMAPI: LastFMAPI, artistName: String) : Response<String>{
-        lateinit var  callResponse: Response<String>
+    private fun getResponseFromService(lastFMAPI: LastFMAPI, artistName: String): Response<String> {
+        lateinit var callResponse: Response<String>
         try {
             callResponse = lastFMAPI.getArtistInfo(artistName).execute()
         } catch (e1: IOException) {
@@ -80,7 +77,7 @@ class OtherInfoWindow : AppCompatActivity() {
         return callResponse
     }
 
-    private fun parseFromJson(callResponse:Response<String>) :List<JsonElement>{
+    private fun parseFromJson(callResponse: Response<String>): List<JsonElement> {
         val infoFromJsonBioContentAndUrl = mutableListOf<JsonElement>()
         val gson = Gson()
         val jObj = gson.fromJson(callResponse.body(), JsonObject::class.java)
@@ -100,35 +97,48 @@ class OtherInfoWindow : AppCompatActivity() {
             if (moreDetailsDescription != null)// exists in db
                 moreDetailsDescription = "[*]$moreDetailsDescription"
             else { // get from service
-                val callResponse = getResponseFromService(lastFMAPI,artistName)
+                val callResponse = getResponseFromService(lastFMAPI, artistName)
                 val bioContentAndUrl = parseFromJson(callResponse)
-                val bioContent= bioContentAndUrl[0]
-                val url= bioContentAndUrl[1]
+                val bioContent = bioContentAndUrl[0]
+                val url = bioContentAndUrl[1]
                 moreDetailsDescription = bioContentToHTML(bioContent, artistName)
                 setURLButtonListener(url)
             }
             val apiImageUrl =
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
             runOnUiThread {
-                Picasso.get().load(apiImageUrl).into(findViewById<View>(R.id.imageView) as ImageView)
+                Picasso.get().load(apiImageUrl)
+                    .into(findViewById<View>(R.id.imageView) as ImageView)
                 moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
             }
         }.start()
     }
 
+
     companion object {
         const val ARTIST_NAME_EXTRA = "artistName"
-        fun textToHtml(text: String, term: String?): String {
-            val builder = StringBuilder()
-            builder.append("<html><div width=400>")
-            builder.append("<font face=\"arial\">")
-            val textWithBold = text
-                .replace("'", " ")
-                .replace("\n", "<br>")
-                .replace("(?i)" + term!!.toRegex(), "<b>" + term.toUpperCase(Locale.getDefault()) + "</b>")
-            builder.append(textWithBold)
-            builder.append("</font></div></html>")
-            return builder.toString()
-        }
     }
+
+    private fun textToHtml(text: String, term: String?): String {
+        val builder = StringBuilder()
+        builder.append("<html><div width=400>")
+        builder.append("<font face=\"arial\">")
+        val textFormatted = formatText(term, text)
+        builder.append(textFormatted)
+        builder.append("</font></div></html>")
+        return builder.toString()
+    }
+
+
+    private fun formatText(term: String?, text: String): String {
+        val textWithBold = text
+            .replace("'", " ")
+            .replace("\n", "<br>")
+            .replace(
+                "(?i)" + term!!.toRegex(),
+                "<b>" + term.toUpperCase(Locale.getDefault()) + "</b>"
+            )
+        return textWithBold
+    }
+
 }
