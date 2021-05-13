@@ -19,13 +19,14 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
     fun saveArtist(artist: String, info: String) {
         val databaseToModify = this.writableDatabase
         val databaseNewRow = ContentValues()
-        fillDatabaseWithNewRow(databaseNewRow, artist, info)
+        val artistInfoArray = arrayOf(artist, info)
+        fillDatabaseWithNewRow(databaseNewRow, artistInfoArray)
         databaseToModify.insert("artists", null, databaseNewRow)
     }
 
-    private fun fillDatabaseWithNewRow(databaseNewColumn: ContentValues,artist: String,info: String){
-        databaseNewColumn.put("artist", artist)
-        databaseNewColumn.put("info", info)
+    private fun fillDatabaseWithNewRow(databaseNewColumn: ContentValues, artistInfo: Array<String>){
+        databaseNewColumn.put("artist", artistInfo[0])
+        databaseNewColumn.put("info", artistInfo[1])
         databaseNewColumn.put("source", 1)
     }
 
