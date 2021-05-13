@@ -9,8 +9,6 @@ import java.util.ArrayList
 
 class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
 
-    private lateinit var database : DataBase
-
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             "create table artists (id INTEGER PRIMARY KEY AUTOINCREMENT, artist string, info string, source integer)")
@@ -19,7 +17,7 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
 
     fun saveArtist(artist: String, info: String) {
-        val databaseToModify = database.writableDatabase
+        val databaseToModify = this.writableDatabase
         val databaseNewRow = ContentValues()
         fillDatabaseWithNewRow(databaseNewRow, artist, info)
         databaseToModify.insert("artists", null, databaseNewRow)
@@ -42,7 +40,7 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
     }
 
     private fun newArtistCursor(artist: String): Cursor {
-        val db = database.readableDatabase
+        val db = this.readableDatabase
         val projection = arrayOf("id", "artist", "info")
         val selection = "artist  = ?"
         val selectionArgs = arrayOf(artist)
