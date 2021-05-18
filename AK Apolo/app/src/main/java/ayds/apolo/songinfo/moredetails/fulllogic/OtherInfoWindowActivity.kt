@@ -32,44 +32,38 @@ const val START_HTML="<html><div width=400>"
 const val FONT_HTML="<font face=\"arial\">"
 const val END_HTML="</font></div></html>"
 
-class OtherInfoWindow : AppCompatActivity() {
+class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var moreDetailsPane: TextView
     private lateinit var dataBase: ArtistTablesCreate
+    private val builder = StringBuilder()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
+
+        initDatabase()
+
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
-        getInfoMoreDetailsPane(intent.getStringExtra(ARTIST_NAME))
+
+        getArtistInfo(intent.getStringExtra(ARTIST_NAME))
     }
 
-    private fun getInfoMoreDetailsPane(artistName: String?) {
+    private fun initDatabase() {
         dataBase = ArtistTablesCreate(this)
-        getArtistInfo(artistName)
     }
-
-    private fun adaptJInterfaceToHTTP() =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .build()
-            .create(LastFMAPI::class.java)
 
     private fun bioContentToHTML(bioContent: JsonElement?, artistName: String): String {
-        var moreDetailsDescription: String
-        when (bioContent) {
+        return when (bioContent) {
             null -> {
-                moreDetailsDescription = NO_RESULTS
+                NO_RESULTS
             }
             else -> {
-                moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
-                moreDetailsDescription = textToHtml(moreDetailsDescription, artistName)
-                dataBase.saveArtist(artistName, moreDetailsDescription)
+                textToHtml(bioContent.asString.replace("\\n", "\n"), artistName)
             }
         }
-        return moreDetailsDescription
     }
+
 
     private fun setURLButtonListener(url: JsonElement) {
         val urlString = url.asString
@@ -104,7 +98,12 @@ class OtherInfoWindow : AppCompatActivity() {
     }
 
     private fun getArtistInfo(artistName: String?) {
-        val lastFMAPI = adaptJInterfaceToHTTP()
+        val lastFMAPI = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
+            .create(LastFMAPI::class.java)
+
         Thread {
             var moreDetailsDescription = dataBase.getInfo(artistName!!)
             if (moreDetailsDescription != null)// exists in db
@@ -115,6 +114,7 @@ class OtherInfoWindow : AppCompatActivity() {
                 val bioContent = bioContentAndUrl[0]
                 val url = bioContentAndUrl[1]
                 moreDetailsDescription = bioContentToHTML(bioContent, ARTIST_NAME)
+                dataBase.saveArtist(artistName, moreDetailsDescription)
                 setURLButtonListener(url)
             }
             val apiImageUrl = IMAGE_URL
@@ -128,7 +128,6 @@ class OtherInfoWindow : AppCompatActivity() {
 
 
     private fun textToHtml(text: String, term: String?): String {
-        val builder = StringBuilder()
         builder.append(START_HTML)
         builder.append(FONT_HTML)
         val textFormatted = formatText(term, text)
