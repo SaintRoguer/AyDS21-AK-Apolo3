@@ -9,9 +9,17 @@ import java.util.ArrayList
 
 const val ARTISTS_COLUMN = "artists"
 const val ARTIST_COLUMN = "artist"
+const val ID_COLUMN = "id"
 const val INFO_COLUMN = "info"
 const val SOURCE_COLUMN = "source"
 const val ARTIST_DESC_COLUMN = "artist DESC"
+
+const val onCreateString: String =
+    "create table $ARTISTS_COLUMN (" +
+            "$ID_COLUMN INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "$ARTIST_COLUMN string, " +
+            "$INFO_COLUMN string, " +
+            "$SOURCE_COLUMN string)"
 
 class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
 
@@ -20,9 +28,7 @@ class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", n
     private val projection = arrayOf(INFO_COLUMN, ARTIST_COLUMN, INFO_COLUMN)
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            "create table artists (id INTEGER PRIMARY KEY AUTOINCREMENT, artist string, info string, source integer)"
-        )
+        db.execSQL(onCreateString)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
