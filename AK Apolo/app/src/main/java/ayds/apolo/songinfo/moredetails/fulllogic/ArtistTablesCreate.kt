@@ -21,7 +21,7 @@ const val onCreateString: String =
             "$INFO_COLUMN string, " +
             "$SOURCE_COLUMN string)"
 
-class DataBase(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
+class ArtistTablesCreate(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
 
     private val databaseToWrite = this.writableDatabase
     private val databaseToRead = this.readableDatabase

@@ -19,26 +19,39 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.IOException
 import java.util.*
 
+const val ARTIST_NAME = "artistName"
+const val BASE_URL = "https://ws.audioscrobbler.com/2.0/"
+const val NO_RESULTS = "No Results"
+const val DATA_ARTIST = "artist"
+const val DATA_BIO = "bio"
+const val DATA_URL = "url"
+const val DATA_CONTENT = "content"
+const val STORE_LETTER = "*"
+const val IMAGE_URL="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+const val START_HTML="<html><div width=400>"
+const val FONT_HTML="<font face=\"arial\">"
+const val END_HTML="</font></div></html>"
+
 class OtherInfoWindow : AppCompatActivity() {
     private lateinit var moreDetailsPane: TextView
-    private lateinit var dataBase: DataBase
+    private lateinit var dataBase: ArtistTablesCreate
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
-        getInfoMoreDetailsPane(intent.getStringExtra("artistName"))
+        getInfoMoreDetailsPane(intent.getStringExtra(ARTIST_NAME))
     }
 
     private fun getInfoMoreDetailsPane(artistName: String?) {
-        dataBase = DataBase(this)
+        dataBase = ArtistTablesCreate(this)
         getArtistInfo(artistName)
     }
 
     private fun adaptJInterfaceToHTTP() =
         Retrofit.Builder()
-            .baseUrl("https://ws.audioscrobbler.com/2.0/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
             .build()
             .create(LastFMAPI::class.java)
@@ -47,7 +60,7 @@ class OtherInfoWindow : AppCompatActivity() {
         var moreDetailsDescription: String
         when (bioContent) {
             null -> {
-                moreDetailsDescription = "No Results"
+                moreDetailsDescription = NO_RESULTS
             }
             else -> {
                 moreDetailsDescription = bioContent.asString.replace("\\n", "\n")
@@ -81,10 +94,10 @@ class OtherInfoWindow : AppCompatActivity() {
         val infoFromJsonBioContentAndUrl = mutableListOf<JsonElement>()
         val gson = Gson()
         val jObj = gson.fromJson(callResponse.body(), JsonObject::class.java)
-        val artist = jObj["artist"].asJsonObject
-        val bio = artist["bio"].asJsonObject
-        val bioContent = bio["content"]
-        val artistUrl = artist["url"]
+        val artist = jObj[DATA_ARTIST].asJsonObject
+        val bio = artist[DATA_BIO].asJsonObject
+        val bioContent = bio[DATA_CONTENT]
+        val artistUrl = artist[DATA_URL]
         infoFromJsonBioContentAndUrl.add(bioContent)
         infoFromJsonBioContentAndUrl.add(artistUrl)
         return infoFromJsonBioContentAndUrl
@@ -95,18 +108,17 @@ class OtherInfoWindow : AppCompatActivity() {
         Thread {
             var moreDetailsDescription = dataBase.getInfo(artistName!!)
             if (moreDetailsDescription != null)// exists in db
-                moreDetailsDescription = "[*]$moreDetailsDescription"
+                moreDetailsDescription = STORE_LETTER.plus(moreDetailsDescription)
             else { // get from service
-                val callResponse = getResponseFromService(lastFMAPI, artistName)
+                val callResponse = getResponseFromService(lastFMAPI, ARTIST_NAME)
                 val bioContentAndUrl = parseFromJson(callResponse)
                 val bioContent = bioContentAndUrl[0]
                 val url = bioContentAndUrl[1]
-                moreDetailsDescription = bioContentToHTML(bioContent, artistName)
+                moreDetailsDescription = bioContentToHTML(bioContent, ARTIST_NAME)
                 setURLButtonListener(url)
             }
-            val apiImageUrl =
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-            runOnUiThread {
+            val apiImageUrl = IMAGE_URL
+                runOnUiThread {
                 Picasso.get().load(apiImageUrl)
                     .into(findViewById<View>(R.id.imageView) as ImageView)
                 moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
@@ -117,11 +129,11 @@ class OtherInfoWindow : AppCompatActivity() {
 
     private fun textToHtml(text: String, term: String?): String {
         val builder = StringBuilder()
-        builder.append("<html><div width=400>")
-        builder.append("<font face=\"arial\">")
+        builder.append(START_HTML)
+        builder.append(FONT_HTML)
         val textFormatted = formatText(term, text)
         builder.append(textFormatted)
-        builder.append("</font></div></html>")
+        builder.append(END_HTML)
         return builder.toString()
     }
 
@@ -138,6 +150,6 @@ class OtherInfoWindow : AppCompatActivity() {
     }
 
     companion object {
-        const val ARTIST_NAME_EXTRA = "artistName"
+        const val ARTIST_NAME_EXTRA = ARTIST_NAME
     }
 }
