@@ -13,6 +13,8 @@ const val ID_COLUMN = "id"
 const val INFO_COLUMN = "info"
 const val SOURCE_COLUMN = "source"
 const val ARTIST_DESC_COLUMN = "artist DESC"
+const val NAME_DATABASE = "dictionary.db"
+const val VERSION_DATABASE = 1
 
 const val onCreateString: String =
     "create table $ARTISTS_COLUMN (" +
@@ -21,10 +23,8 @@ const val onCreateString: String =
             "$INFO_COLUMN string, " +
             "$SOURCE_COLUMN string)"
 
-class ArtistTablesCreate(context: Context?) : SQLiteOpenHelper(context, "dictionary.db", null, 1) {
+class ArtistTablesCreate(context: Context) : SQLiteOpenHelper(context, NAME_DATABASE, null, VERSION_DATABASE) {
 
-    private val databaseToWrite = this.writableDatabase
-    private val databaseToRead = this.readableDatabase
     private val projection = arrayOf(INFO_COLUMN, ARTIST_COLUMN, INFO_COLUMN)
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -34,36 +34,29 @@ class ArtistTablesCreate(context: Context?) : SQLiteOpenHelper(context, "diction
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
 
     fun saveArtist(artist: String, info: String) {
-        val databaseNewRow = ContentValues()
         val artistInfoArray = arrayOf(artist, info)
-        fillDatabaseWithNewRow(databaseNewRow, artistInfoArray)
-        databaseToWrite.insert(ARTISTS_COLUMN, null, databaseNewRow)
+        fillDatabaseWithNewRow(artistInfoArray)
+        this.writableDatabase.insert(ARTISTS_COLUMN, null, ContentValues())
     }
 
-    private fun fillDatabaseWithNewRow(
-        databaseNewColumn: ContentValues,
-        artistInfo: Array<String>
-    ) {
-        databaseNewColumn.put(ARTIST_COLUMN, artistInfo[0])
-        databaseNewColumn.put(INFO_COLUMN, artistInfo[1])
-        databaseNewColumn.put(SOURCE_COLUMN, 1)
+    private fun fillDatabaseWithNewRow(artistInfo: Array<String>) = ContentValues().apply{
+        put(ARTIST_COLUMN, artistInfo[0])
+        put(INFO_COLUMN, artistInfo[1])
+        put(SOURCE_COLUMN, 1)
     }
 
     fun getInfo(artist: String): String? {
         val cursor: Cursor = newArtistCursor(artist)
         val items = getArtistItems(cursor)
         cursor.close()
-        return when {
-            items.isEmpty() -> null
-            else -> items[0]
-        }
+        return items.firstOrNull()
     }
 
     private fun newArtistCursor(artist: String): Cursor {
         val selection = "artist  = ?"
         val selectionArgs = arrayOf(artist)
         val sortOrder = ARTIST_DESC_COLUMN
-        return databaseToRead.query(
+        return this.readableDatabase.query(
             ARTISTS_COLUMN,
             projection,
             selection,
