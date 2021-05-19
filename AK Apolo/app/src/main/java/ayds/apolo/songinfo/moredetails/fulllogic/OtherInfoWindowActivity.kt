@@ -36,21 +36,74 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var moreDetailsPane: TextView
     private lateinit var dataBase: ArtistTablesCreate
     private val builder = StringBuilder()
-
+    private lateinit var apiBuilder : Retrofit
+    private lateinit var buttonView : View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
 
         initDatabase()
-
-        moreDetailsPane = findViewById(R.id.moreDetailsPane)
-
-        getArtistInfo(intent.getStringExtra(ARTIST_NAME))
+        initMoreDetailsPane()
+        initProperties()
     }
 
     private fun initDatabase() {
         dataBase = ArtistTablesCreate(this)
+    }
+
+    private fun initMoreDetailsPane() {
+        moreDetailsPane = findViewById(R.id.moreDetailsPane)
+    }
+
+    private fun initProperties() {
+        initApiBuilder()
+        initArtistInfo()
+        initButtonView()
+    }
+
+    private fun initApiBuilder(){
+        apiBuilder = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
+    }
+
+    private fun initArtistInfo() {
+        getArtistInfo(intent.getStringExtra(ARTIST_NAME))
+    }
+
+    private fun initButtonView() {
+        buttonView = findViewById<View>(R.id.openUrlButton)
+    }
+
+    private fun getArtistInfo(artistName: String?) {
+        val lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
+
+        initThread(artistName, lastFMAPI)
+    }
+
+    private fun initThread(artistName: String?, lastFMAPI: LastFMAPI) {
+        Thread {
+            var moreDetailsDescription = dataBase.getInfo(artistName!!)
+            if (moreDetailsDescription != null)// exists in db
+                moreDetailsDescription = STORE_LETTER.plus(moreDetailsDescription)
+            else { // get from service
+                val callResponse = getResponseFromService(lastFMAPI, ARTIST_NAME)
+                val bioContentAndUrl = parseFromJson(callResponse)
+                val bioContent = bioContentAndUrl[0]
+                val url = bioContentAndUrl[1]
+                moreDetailsDescription = bioContentToHTML(bioContent, ARTIST_NAME)
+                dataBase.saveArtist(artistName, moreDetailsDescription)
+                setURLButtonListener(url)
+            }
+            val apiImageUrl = IMAGE_URL
+            runOnUiThread {
+                Picasso.get().load(apiImageUrl)
+                    .into(findViewById<View>(R.id.imageView) as ImageView)
+                moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
+            }
+        }.start()
     }
 
     private fun bioContentToHTML(bioContent: JsonElement?, artistName: String): String {
@@ -64,12 +117,10 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setURLButtonListener(url: JsonElement) {
-        val urlString = url.asString
-        findViewById<View>(R.id.openUrlButton).setOnClickListener {
+        buttonView.setOnClickListener {
             val openUrlAction = Intent(Intent.ACTION_VIEW)
-            openUrlAction.data = Uri.parse(urlString)
+            openUrlAction.data = Uri.parse(url.asString)
             startActivity(openUrlAction)
         }
     }
@@ -86,46 +137,20 @@ class OtherInfoWindowActivity : AppCompatActivity() {
 
     private fun parseFromJson(callResponse: Response<String>): List<JsonElement> {
         val infoFromJsonBioContentAndUrl = mutableListOf<JsonElement>()
-        val gson = Gson()
-        val jObj = gson.fromJson(callResponse.body(), JsonObject::class.java)
-        val artist = jObj[DATA_ARTIST].asJsonObject
-        val bio = artist[DATA_BIO].asJsonObject
-        val bioContent = bio[DATA_CONTENT]
-        val artistUrl = artist[DATA_URL]
-        infoFromJsonBioContentAndUrl.add(bioContent)
-        infoFromJsonBioContentAndUrl.add(artistUrl)
+
+        val artist = getArtistJson(callResponse)
+
+        infoFromJsonBioContentAndUrl.add(artist[DATA_BIO].asJsonObject[DATA_CONTENT])
+        infoFromJsonBioContentAndUrl.add(artist[DATA_URL])
+
         return infoFromJsonBioContentAndUrl
     }
 
-    private fun getArtistInfo(artistName: String?) {
-        val lastFMAPI = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .build()
-            .create(LastFMAPI::class.java)
-
-        Thread {
-            var moreDetailsDescription = dataBase.getInfo(artistName!!)
-            if (moreDetailsDescription != null)// exists in db
-                moreDetailsDescription = STORE_LETTER.plus(moreDetailsDescription)
-            else { // get from service
-                val callResponse = getResponseFromService(lastFMAPI, ARTIST_NAME)
-                val bioContentAndUrl = parseFromJson(callResponse)
-                val bioContent = bioContentAndUrl[0]
-                val url = bioContentAndUrl[1]
-                moreDetailsDescription = bioContentToHTML(bioContent, ARTIST_NAME)
-                dataBase.saveArtist(artistName, moreDetailsDescription)
-                setURLButtonListener(url)
-            }
-            val apiImageUrl = IMAGE_URL
-                runOnUiThread {
-                Picasso.get().load(apiImageUrl)
-                    .into(findViewById<View>(R.id.imageView) as ImageView)
-                moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
-            }
-        }.start()
+    private fun getArtistJson(callResponse: Response<String>): JsonObject {
+        val gson = Gson()
+        val jObj = gson.fromJson(callResponse.body(), JsonObject::class.java)
+        return jObj[DATA_ARTIST].asJsonObject
     }
-
 
     private fun textToHtml(text: String, term: String?): String {
         builder.append(START_HTML)
@@ -135,7 +160,6 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         builder.append(END_HTML)
         return builder.toString()
     }
-
 
     private fun formatText(term: String?, text: String): String {
         val textWithBold = text
