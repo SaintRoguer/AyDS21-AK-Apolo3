@@ -79,31 +79,45 @@ class OtherInfoWindowActivity : AppCompatActivity() {
 
     private fun getArtistInfo(artistName: String?) {
         val lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
-
         initThread(artistName, lastFMAPI)
     }
 
-    private fun initThread(artistName: String?, lastFMAPI: LastFMAPI) {
+    private fun initThread(artistName: String?, lastFMAPI: LastFMAPI, ) {
         Thread {
-            var moreDetailsDescription = dataBase.getInfo(artistName!!)
-            if (moreDetailsDescription != null)// exists in db
-                moreDetailsDescription = STORE_LETTER.plus(moreDetailsDescription)
-            else { // get from service
-                val callResponse = getResponseFromService(lastFMAPI, ARTIST_NAME)
-                val bioContentAndUrl = parseFromJson(callResponse)
-                val bioContent = bioContentAndUrl[0]
-                val url = bioContentAndUrl[1]
-                moreDetailsDescription = bioContentToHTML(bioContent, ARTIST_NAME)
-                dataBase.saveArtist(artistName, moreDetailsDescription)
-                setURLButtonListener(url)
+            var resultArtistFromDatabase = getArtistFromDatabase(artistName)
+            resultArtistFromDatabase = if (resultArtistFromDatabase != null)
+                STORE_LETTER.plus(resultArtistFromDatabase)
+            else {
+                writeArtistInDatabase(lastFMAPI,artistName!!)
             }
             val apiImageUrl = IMAGE_URL
             runOnUiThread {
-                Picasso.get().load(apiImageUrl)
-                    .into(findViewById<View>(R.id.imageView) as ImageView)
-                moreDetailsPane.text = Html.fromHtml(moreDetailsDescription)
+                initApiImage(apiImageUrl, resultArtistFromDatabase)
             }
         }.start()
+    }
+
+    private fun initApiImage(apiImageUrl: String, resultArtistFromDatabase: String?) {
+        Picasso.get().load(apiImageUrl)
+            .into(findViewById<View>(R.id.imageView) as ImageView)
+        moreDetailsPane.text = Html.fromHtml(resultArtistFromDatabase)
+    }
+
+    private fun getArtistFromDatabase(artistName:String?):String?{
+        return dataBase.getInfo(artistName!!)
+    }
+
+    private fun writeArtistInDatabase(lastFMAPI:LastFMAPI, artistName:String): String {
+        val contentAndUrl = initContentAndUrl(lastFMAPI,artistName)
+        var assignArtistContent=bioContentToHTML(contentAndUrl[0], artistName)
+        initURLButtonListener(contentAndUrl[1])
+        saveArtistInDatabase(artistName, assignArtistContent)
+        return assignArtistContent
+    }
+
+    private fun initContentAndUrl(lastFMAPI: LastFMAPI, artistName:String): List<JsonElement> {
+        val callResponse = getResponseFromService(lastFMAPI, artistName)
+        return parseFromJson(callResponse)
     }
 
     private fun bioContentToHTML(bioContent: JsonElement?, artistName: String): String {
@@ -115,6 +129,14 @@ class OtherInfoWindowActivity : AppCompatActivity() {
                 textToHtml(bioContent.asString.replace("\\n", "\n"), artistName)
             }
         }
+    }
+
+    private fun initURLButtonListener(URL: JsonElement) {
+        setURLButtonListener(URL)
+    }
+
+    private fun saveArtistInDatabase(artistName: String, assignArtistContent: String){
+        dataBase.saveArtist(artistName!!, assignArtistContent)
     }
 
     private fun setURLButtonListener(url: JsonElement) {
