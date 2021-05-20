@@ -27,17 +27,19 @@ const val DATA_BIO = "bio"
 const val DATA_URL = "url"
 const val DATA_CONTENT = "content"
 const val STORE_LETTER = "*"
-const val IMAGE_URL="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-const val START_HTML="<html><div width=400>"
-const val FONT_HTML="<font face=\"arial\">"
-const val END_HTML="</font></div></html>"
+const val IMAGE_URL =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+const val START_HTML = "<html><div width=400>"
+const val FONT_HTML = "<font face=\"arial\">"
+const val END_HTML = "</font></div></html>"
 
 class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var moreDetailsPane: TextView
     private lateinit var dataBase: ArtistTablesCreate
     private val builder = StringBuilder()
-    private lateinit var apiBuilder : Retrofit
-    private lateinit var buttonView : View
+    private lateinit var apiBuilder: Retrofit
+    private lateinit var buttonView: View
+    private lateinit var artistImageView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +64,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         initButtonView()
     }
 
-    private fun initApiBuilder(){
+    private fun initApiBuilder() {
         apiBuilder = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
@@ -79,22 +81,29 @@ class OtherInfoWindowActivity : AppCompatActivity() {
 
     private fun getArtistInfo(artistName: String?) {
         val lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
-        initThread(artistName, lastFMAPI)
+        initArtistThread(artistName, lastFMAPI)
     }
 
-    private fun initThread(artistName: String?, lastFMAPI: LastFMAPI, ) {
+    private fun initArtistThread(artistName: String?, lastFMAPI: LastFMAPI) {
         Thread {
-            var resultArtistFromDatabase = getArtistFromDatabase(artistName)
-            resultArtistFromDatabase = if (resultArtistFromDatabase != null)
-                STORE_LETTER.plus(resultArtistFromDatabase)
-            else {
-                writeArtistInDatabase(lastFMAPI,artistName!!)
-            }
-            val apiImageUrl = IMAGE_URL
-            runOnUiThread {
-                initApiImage(apiImageUrl, resultArtistFromDatabase)
-            }
+            checkArtistInDatabase(artistName, lastFMAPI)
         }.start()
+    }
+
+    private fun checkArtistInDatabase(
+        artistName: String?,
+        lastFMAPI: LastFMAPI
+    ) {
+        var resultArtistFromDatabase = getArtistFromDatabase(artistName)
+        resultArtistFromDatabase = if (resultArtistFromDatabase != null)
+            STORE_LETTER.plus(resultArtistFromDatabase)
+        else {
+            writeArtistInDatabase(lastFMAPI, artistName!!)
+        }
+        val apiImageUrl = IMAGE_URL
+        runOnUiThread {
+            initApiImage(apiImageUrl, resultArtistFromDatabase)
+        }
     }
 
     private fun initApiImage(apiImageUrl: String, resultArtistFromDatabase: String?) {
@@ -103,19 +112,19 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         moreDetailsPane.text = Html.fromHtml(resultArtistFromDatabase)
     }
 
-    private fun getArtistFromDatabase(artistName:String?):String?{
+    private fun getArtistFromDatabase(artistName: String?): String? {
         return dataBase.getInfo(artistName!!)
     }
 
-    private fun writeArtistInDatabase(lastFMAPI:LastFMAPI, artistName:String): String {
-        val contentAndUrl = initContentAndUrl(lastFMAPI,artistName)
-        var assignArtistContent=bioContentToHTML(contentAndUrl[0], artistName)
+    private fun writeArtistInDatabase(lastFMAPI: LastFMAPI, artistName: String): String {
+        val contentAndUrl = initContentAndUrl(lastFMAPI, artistName)
+        var assignArtistContent = bioContentToHTML(contentAndUrl[0], artistName)
         initURLButtonListener(contentAndUrl[1])
         saveArtistInDatabase(artistName, assignArtistContent)
         return assignArtistContent
     }
 
-    private fun initContentAndUrl(lastFMAPI: LastFMAPI, artistName:String): List<JsonElement> {
+    private fun initContentAndUrl(lastFMAPI: LastFMAPI, artistName: String): List<JsonElement> {
         val callResponse = getResponseFromService(lastFMAPI, artistName)
         return parseFromJson(callResponse)
     }
@@ -135,7 +144,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         setURLButtonListener(URL)
     }
 
-    private fun saveArtistInDatabase(artistName: String, assignArtistContent: String){
+    private fun saveArtistInDatabase(artistName: String, assignArtistContent: String) {
         dataBase.saveArtist(artistName!!, assignArtistContent)
     }
 
