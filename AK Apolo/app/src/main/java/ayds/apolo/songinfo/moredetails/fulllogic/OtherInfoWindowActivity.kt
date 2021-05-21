@@ -172,7 +172,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private fun parseFromJson(callResponse: Response<String>){
         val artistJson = getArtistJson(callResponse)
         jsonContent =artistJson[DATA_BIO].asJsonObject[DATA_CONTENT]
-        urlString = artistJson[DATA_URL].toString()
+        urlString = artistJson[DATA_URL].asString
     }
 
     private fun getArtistJson(callResponse: Response<String>): JsonObject {
