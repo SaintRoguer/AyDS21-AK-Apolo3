@@ -35,8 +35,8 @@ class ArtistTablesCreate(context: Context) : SQLiteOpenHelper(context, NAME_DATA
 
     fun saveArtist(artist: String, info: String) {
         val artistInfoArray = arrayOf(artist, info)
-        fillDatabaseWithNewRow(artistInfoArray)
-        this.writableDatabase.insert(ARTISTS_COLUMN, null, ContentValues())
+        val column=fillDatabaseWithNewRow(artistInfoArray)
+        this.writableDatabase.insert(ARTISTS_COLUMN, null, column)
     }
 
     private fun fillDatabaseWithNewRow(artistInfo: Array<String>) = ContentValues().apply{

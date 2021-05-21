@@ -39,7 +39,9 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private val builder = StringBuilder()
     private lateinit var apiBuilder: Retrofit
     private lateinit var buttonView: View
+    private lateinit var imageView : ImageView
     private var resultArtistFromDatabase: String? = null
+    private lateinit var lastFMAPI:LastFMAPI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +64,8 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         initApiBuilder()
         initArtistInfo()
         initButtonView()
+        initImageView()
+        initLastFMAPI()
     }
 
     private fun initApiBuilder() {
@@ -72,61 +76,64 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun initArtistInfo() {
-        getArtistInfo(intent.getStringExtra(ARTIST_NAME))
+        val artistName = (intent.getStringExtra(ARTIST_NAME))
+        artistName?.let { initArtistThread(it) }
     }
 
     private fun initButtonView() {
-        buttonView = findViewById<View>(R.id.openUrlButton)
+        buttonView = findViewById(R.id.openUrlButton)
     }
 
-    private fun getArtistInfo(artistName: String?) {
-        val lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
-        initArtistThread(artistName, lastFMAPI)
+    private fun initImageView(){
+        imageView = findViewById(R.id.imageView)
     }
 
-    private fun initArtistThread(artistName: String?, lastFMAPI: LastFMAPI) {
+    private fun initLastFMAPI(){
+       lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
+    }
+
+    private fun initArtistThread(artistName: String) {
         Thread {
-            checkArtistInDatabase(artistName, lastFMAPI)
+            checkArtistInDatabase(artistName)
+            runUiThread()
         }.start()
     }
 
-    private fun checkArtistInDatabase(
-        artistName: String?,
-        lastFMAPI: LastFMAPI
-    ) {
+    private fun checkArtistInDatabase(artistName: String) {
         resultArtistFromDatabase = getArtistFromDatabase(artistName)
-        resultArtistFromDatabase = if (resultArtistFromDatabase != null)
-            STORE_LETTER.plus(resultArtistFromDatabase)
-        else {
-            writeArtistInDatabase(lastFMAPI, artistName!!)
-        }
-        val apiImageUrl = IMAGE_URL
-        println(apiImageUrl)
+        resultArtistFromDatabase =
+            when (resultArtistFromDatabase) {
+                null -> writeArtistInDatabase(artistName)
+                else -> STORE_LETTER.plus(resultArtistFromDatabase)
+
+            }
+    }
+
+    private fun runUiThread(){
         runOnUiThread {
-            initApiImage(apiImageUrl, resultArtistFromDatabase)
+            initApiImage(resultArtistFromDatabase)
         }
     }
 
-    private fun initApiImage(apiImageUrl: String, resultArtistFromDatabase: String?) {
-        Picasso.get().load(apiImageUrl)
-            .into(findViewById<View>(R.id.imageView) as ImageView)
+    private fun initApiImage(resultArtistFromDatabase: String?) {
+        Picasso.get().load(IMAGE_URL).into(imageView)
         moreDetailsPane.text = Html.fromHtml(resultArtistFromDatabase)
     }
 
-    private fun getArtistFromDatabase(artistName: String?): String? {
-        return dataBase.getInfo(artistName!!)
+    private fun getArtistFromDatabase(artistName: String): String? {
+        return dataBase.getInfo(artistName)
     }
 
-    private fun writeArtistInDatabase(lastFMAPI: LastFMAPI, artistName: String): String {
-        val contentAndUrl = initContentAndUrl(lastFMAPI, artistName)
-        var assignArtistContent = bioContentToHTML(contentAndUrl[0], artistName)
+    private fun writeArtistInDatabase(artistName: String): String {
+        val contentAndUrl = initContentAndUrl(artistName)
+        val assignArtistContent = bioContentToHTML(contentAndUrl[0], artistName)
         initURLButtonListener(contentAndUrl[1])
         saveArtistInDatabase(artistName, assignArtistContent)
         return assignArtistContent
     }
 
-    private fun initContentAndUrl(lastFMAPI: LastFMAPI, artistName: String): List<JsonElement> {
-        val callResponse = getResponseFromService(lastFMAPI, artistName)
+    private fun initContentAndUrl(artistName: String): List<JsonElement> {
+        val callResponse = getResponseFromService(artistName)
         return parseFromJson(callResponse)
     }
 
@@ -146,7 +153,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun saveArtistInDatabase(artistName: String, assignArtistContent: String) {
-        dataBase.saveArtist(artistName!!, assignArtistContent)
+        dataBase.saveArtist(artistName, assignArtistContent)
     }
 
     private fun setURLButtonListener(url: JsonElement) {
@@ -157,7 +164,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         }
     }
 
-    private fun getResponseFromService(lastFMAPI: LastFMAPI, artistName: String): Response<String> {
+    private fun getResponseFromService(artistName: String): Response<String> {
         lateinit var callResponse: Response<String>
         try {
             callResponse = lastFMAPI.getArtistInfo(artistName).execute()
@@ -184,7 +191,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         return jObj[DATA_ARTIST].asJsonObject
     }
 
-    private fun textToHtml(text: String, term: String?): String {
+    private fun textToHtml(text: String, term: String): String {
         builder.append(START_HTML)
         builder.append(FONT_HTML)
         val textFormatted = formatText(term, text)
@@ -193,15 +200,14 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         return builder.toString()
     }
 
-    private fun formatText(term: String?, text: String): String {
-        val textWithBold = text
+    private fun formatText(term: String, text: String): String {
+        return text
             .replace("'", " ")
             .replace("\n", "<br>")
             .replace(
-                "(?i)" + term!!.toRegex(),
+                "(?i)" + term.toRegex(),
                 "<b>" + term.toUpperCase(Locale.getDefault()) + "</b>"
             )
-        return textWithBold
     }
 
     companion object {
