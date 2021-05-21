@@ -16,12 +16,10 @@ import com.squareup.picasso.Picasso
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import java.io.IOException
 import java.util.*
 
 const val ARTIST_NAME = "artistName"
 const val BASE_URL = "https://ws.audioscrobbler.com/2.0/"
-const val NO_RESULTS = "No Results"
 const val DATA_ARTIST = "artist"
 const val DATA_BIO = "bio"
 const val DATA_URL = "url"
@@ -42,6 +40,9 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var imageView : ImageView
     private var resultArtistFromDatabase: String? = null
     private lateinit var lastFMAPI:LastFMAPI
+    private lateinit var artistName : String
+    private lateinit var jsonContent : JsonElement
+    private lateinit var urlString : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +67,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         initButtonView()
         initImageView()
         initLastFMAPI()
+        initListeners()
     }
 
     private fun initApiBuilder() {
@@ -76,8 +78,10 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun initArtistInfo() {
-        val artistName = (intent.getStringExtra(ARTIST_NAME))
-        artistName?.let { initArtistThread(it) }
+        artistName = (intent.getStringExtra(ARTIST_NAME)).toString()
+        artistName?.let {
+            initArtistThread()
+        }
     }
 
     private fun initButtonView() {
@@ -92,22 +96,27 @@ class OtherInfoWindowActivity : AppCompatActivity() {
        lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
     }
 
-    private fun initArtistThread(artistName: String) {
+    private fun initListeners(){
+        initURLButtonListener()
+    }
+
+    private fun initArtistThread() {
         Thread {
-            checkArtistInDatabase(artistName)
+            checkArtistInDatabase()
             runUiThread()
         }.start()
     }
 
-    private fun checkArtistInDatabase(artistName: String) {
-        resultArtistFromDatabase = getArtistFromDatabase(artistName)
+    private fun checkArtistInDatabase() {
+        resultArtistFromDatabase = getArtistFromDatabase()
         resultArtistFromDatabase =
             when (resultArtistFromDatabase) {
-                null -> writeArtistInDatabase(artistName)
-                else -> STORE_LETTER.plus(resultArtistFromDatabase)
-
+                null -> writeArtistInDatabase()
+                else -> plusStoreLetter()
             }
     }
+
+    private fun plusStoreLetter() : String = STORE_LETTER.plus(resultArtistFromDatabase)
 
     private fun runUiThread(){
         runOnUiThread {
@@ -120,69 +129,50 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         moreDetailsPane.text = Html.fromHtml(resultArtistFromDatabase)
     }
 
-    private fun getArtistFromDatabase(artistName: String): String? {
+    private fun getArtistFromDatabase(): String? {
         return dataBase.getInfo(artistName)
     }
 
-    private fun writeArtistInDatabase(artistName: String): String {
-        val contentAndUrl = initContentAndUrl(artistName)
-        val assignArtistContent = bioContentToHTML(contentAndUrl[0], artistName)
-        initURLButtonListener(contentAndUrl[1])
-        saveArtistInDatabase(artistName, assignArtistContent)
+    private fun writeArtistInDatabase(): String {
+        getResponse()
+        val assignArtistContent = bioContentToHTML()
+        saveArtistInDatabase(assignArtistContent)
         return assignArtistContent
     }
 
-    private fun initContentAndUrl(artistName: String): List<JsonElement> {
-        val callResponse = getResponseFromService(artistName)
-        return parseFromJson(callResponse)
+    private fun getResponse(){
+        parseFromJson(getResponseFromService(artistName))
     }
 
-    private fun bioContentToHTML(bioContent: JsonElement?, artistName: String): String {
-        return when (bioContent) {
-            null -> {
-                NO_RESULTS
-            }
-            else -> {
-                textToHtml(bioContent.asString.replace("\\n", "\n"), artistName)
-            }
-        }
-    }
-
-    private fun initURLButtonListener(URL: JsonElement) {
-        setURLButtonListener(URL)
-    }
-
-    private fun saveArtistInDatabase(artistName: String, assignArtistContent: String) {
+    private fun saveArtistInDatabase(assignArtistContent: String) {
         dataBase.saveArtist(artistName, assignArtistContent)
     }
 
-    private fun setURLButtonListener(url: JsonElement) {
+    private fun bioContentToHTML(): String =
+        when (jsonContent) {
+            else -> textToHtml(jsonContent.asString.replace("\\n", "\n"), artistName)
+        }
+
+
+    private fun initURLButtonListener() =
         buttonView.setOnClickListener {
-            val openUrlAction = Intent(Intent.ACTION_VIEW)
-            openUrlAction.data = Uri.parse(url.asString)
-            startActivity(openUrlAction)
+            openURLActivity()
         }
+
+    private fun openURLActivity() {
+        val openUrlAction = Intent(Intent.ACTION_VIEW)
+        openUrlAction.data = Uri.parse(urlString)
+        startActivity(openUrlAction)
     }
 
-    private fun getResponseFromService(artistName: String): Response<String> {
-        lateinit var callResponse: Response<String>
-        try {
-            callResponse = lastFMAPI.getArtistInfo(artistName).execute()
-        } catch (e1: IOException) {
-            e1.printStackTrace()
-        }
-        return callResponse
-    }
+    private fun getResponseFromService(artistName: String): Response<String> =
+        lastFMAPI.getArtistInfo(artistName).execute()
 
-    private fun parseFromJson(callResponse: Response<String>): List<JsonElement> {
-        val infoFromJsonBioContentAndUrl = mutableListOf<JsonElement>()
 
-        val artist = getArtistJson(callResponse)
-
-        infoFromJsonBioContentAndUrl.add(artist[DATA_BIO].asJsonObject[DATA_CONTENT])
-        infoFromJsonBioContentAndUrl.add(artist[DATA_URL])
-
-        return infoFromJsonBioContentAndUrl
+    private fun parseFromJson(callResponse: Response<String>){
+        val artistJson = getArtistJson(callResponse)
+        jsonContent =artistJson[DATA_BIO].asJsonObject[DATA_CONTENT]
+        urlString = artistJson[DATA_URL].toString()
     }
 
     private fun getArtistJson(callResponse: Response<String>): JsonObject {
