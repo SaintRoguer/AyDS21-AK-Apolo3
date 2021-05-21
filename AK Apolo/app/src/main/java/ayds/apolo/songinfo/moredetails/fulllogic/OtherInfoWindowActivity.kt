@@ -43,6 +43,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var artistName : String
     private lateinit var jsonContent : JsonElement
     private lateinit var urlString : String
+    private lateinit var assignArtistContent : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,17 +135,17 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun writeArtistInDatabase(): String {
-        getResponse()
-        val assignArtistContent = bioContentToHTML()
-        saveArtistInDatabase(assignArtistContent)
+        setContentAndURL()
+        assignArtistContent = bioContentToHTML()
+        saveArtistInDatabase()
         return assignArtistContent
     }
 
-    private fun getResponse(){
+    private fun setContentAndURL(){
         parseFromJson(getResponseFromService(artistName))
     }
 
-    private fun saveArtistInDatabase(assignArtistContent: String) {
+    private fun saveArtistInDatabase() {
         dataBase.saveArtist(artistName, assignArtistContent)
     }
 
