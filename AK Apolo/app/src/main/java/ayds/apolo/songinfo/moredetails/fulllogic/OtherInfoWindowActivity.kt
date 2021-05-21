@@ -39,7 +39,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private val builder = StringBuilder()
     private lateinit var apiBuilder: Retrofit
     private lateinit var buttonView: View
-    private lateinit var artistImageView: ImageView
+    private var resultArtistFromDatabase: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,13 +94,14 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         artistName: String?,
         lastFMAPI: LastFMAPI
     ) {
-        var resultArtistFromDatabase = getArtistFromDatabase(artistName)
+        resultArtistFromDatabase = getArtistFromDatabase(artistName)
         resultArtistFromDatabase = if (resultArtistFromDatabase != null)
             STORE_LETTER.plus(resultArtistFromDatabase)
         else {
             writeArtistInDatabase(lastFMAPI, artistName!!)
         }
         val apiImageUrl = IMAGE_URL
+        println(apiImageUrl)
         runOnUiThread {
             initApiImage(apiImageUrl, resultArtistFromDatabase)
         }
