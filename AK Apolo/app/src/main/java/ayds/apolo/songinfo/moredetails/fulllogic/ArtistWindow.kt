@@ -37,13 +37,13 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private val builder = StringBuilder()
     private lateinit var apiBuilder: Retrofit
     private lateinit var buttonView: View
-    private lateinit var imageView : ImageView
+    private lateinit var imageView: ImageView
     private var resultArtistFromDatabase: String? = null
-    private lateinit var lastFMAPI:LastFMAPI
-    private lateinit var artistName : String
-    private lateinit var jsonContent : JsonElement
-    private lateinit var urlString : String
-    private lateinit var assignArtistContent : String
+    private lateinit var lastFMAPI: LastFMAPI
+    private lateinit var artistName: String
+    private lateinit var jsonContent: JsonElement
+    private lateinit var urlString: String
+    private lateinit var assignArtistContent: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,15 +89,15 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         buttonView = findViewById(R.id.openUrlButton)
     }
 
-    private fun initImageView(){
+    private fun initImageView() {
         imageView = findViewById(R.id.imageView)
     }
 
-    private fun initLastFMAPI(){
-       lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
+    private fun initLastFMAPI() {
+        lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
     }
 
-    private fun initListeners(){
+    private fun initListeners() {
         initURLButtonListener()
     }
 
@@ -117,9 +117,9 @@ class OtherInfoWindowActivity : AppCompatActivity() {
             }
     }
 
-    private fun plusStoreLetter() : String = STORE_LETTER.plus(resultArtistFromDatabase)
+    private fun plusStoreLetter(): String = STORE_LETTER.plus(resultArtistFromDatabase)
 
-    private fun runUiThread(){
+    private fun runUiThread() {
         runOnUiThread {
             initApiImage(resultArtistFromDatabase)
         }
@@ -141,7 +141,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         return assignArtistContent
     }
 
-    private fun setContentAndURL(){
+    private fun setContentAndURL() {
         parseFromJson(getResponseFromService(artistName))
     }
 
@@ -170,9 +170,9 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         lastFMAPI.getArtistInfo(artistName).execute()
 
 
-    private fun parseFromJson(callResponse: Response<String>){
+    private fun parseFromJson(callResponse: Response<String>) {
         val artistJson = getArtistJson(callResponse)
-        jsonContent =artistJson[DATA_BIO].asJsonObject[DATA_CONTENT]
+        jsonContent = artistJson[DATA_BIO].asJsonObject[DATA_CONTENT]
         urlString = artistJson[DATA_URL].asString
     }
 
