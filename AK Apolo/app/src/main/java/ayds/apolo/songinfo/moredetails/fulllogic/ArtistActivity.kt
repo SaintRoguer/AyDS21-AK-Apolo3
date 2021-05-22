@@ -103,18 +103,20 @@ class OtherInfoWindowActivity : AppCompatActivity() {
 
     private fun initArtistThread() {
         Thread {
-            checkArtistInDatabase()
+            updateArtistInfo()
             initArtistUI()
         }.start()
     }
 
-    private fun checkArtistInDatabase() {
+    private fun updateArtistInfo() {
         resultArtistFromDatabase = getArtistFromDatabase()
-        resultArtistFromDatabase =
-            when (resultArtistFromDatabase) {
-                null -> writeArtistInDatabase()
-                else -> addStorePrefix()
-            }
+        if(resultArtistFromDatabase != null)
+            addStorePrefix()
+        else
+        {
+            resultArtistFromDatabase=artistToHTML()
+            saveArtistInDatabase()
+        }
     }
 
     private fun addStorePrefix(): String = STORE_LETTER.plus(resultArtistFromDatabase)
@@ -138,10 +140,9 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         return dataBase.getInfo(artistName)
     }
 
-    private fun writeArtistInDatabase(): String {
+    private fun artistToHTML(): String {
         setContentAndURL()
         assignArtistContent = bioContentToHTML()
-        saveArtistInDatabase()
         return assignArtistContent
     }
 
@@ -154,9 +155,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun bioContentToHTML(): String =
-        when (jsonContent) {
-            else -> textToHtml(jsonContent.asString.replace("\\n", "\n"), artistName)
-        }
+        textToHtml(jsonContent.asString.replace("\\n", "\n"), artistName)
 
 
     private fun initURLButtonListener() =
