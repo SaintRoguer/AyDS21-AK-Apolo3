@@ -104,7 +104,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private fun initArtistThread() {
         Thread {
             checkArtistInDatabase()
-            runUiThread()
+            initArtistUI()
         }.start()
     }
 
@@ -113,20 +113,24 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         resultArtistFromDatabase =
             when (resultArtistFromDatabase) {
                 null -> writeArtistInDatabase()
-                else -> plusStoreLetter()
+                else -> addStorePrefix()
             }
     }
 
-    private fun plusStoreLetter(): String = STORE_LETTER.plus(resultArtistFromDatabase)
+    private fun addStorePrefix(): String = STORE_LETTER.plus(resultArtistFromDatabase)
 
-    private fun runUiThread() {
+    private fun initArtistUI() {
         runOnUiThread {
-            initApiImage(resultArtistFromDatabase)
+            loadArtistImage()
+            loadArtistText()
         }
     }
 
-    private fun initApiImage(resultArtistFromDatabase: String?) {
+    private fun loadArtistImage() {
         Picasso.get().load(IMAGE_URL).into(imageView)
+    }
+
+    private fun loadArtistText() {
         moreDetailsPane.text = Html.fromHtml(resultArtistFromDatabase)
     }
 
