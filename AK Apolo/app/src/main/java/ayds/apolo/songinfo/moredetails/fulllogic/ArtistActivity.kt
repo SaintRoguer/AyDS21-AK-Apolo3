@@ -38,7 +38,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var apiBuilder: Retrofit
     private lateinit var buttonView: View
     private lateinit var imageView: ImageView
-    private var resultArtistFromDatabase: String? = null
+    private var resultArtistFromFMApi: String? = null
     private lateinit var lastFMAPI: LastFMAPI
     private lateinit var artistName: String
     private lateinit var jsonContent: JsonElement
@@ -104,24 +104,24 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private fun initArtistThread() {
         Thread {
             updateArtistInfo()
-            initArtistUI()
+            updateArtistInfoUI()
         }.start()
     }
 
     private fun updateArtistInfo() {
-        resultArtistFromDatabase = getArtistFromDatabase()
-        if(resultArtistFromDatabase != null)
+        resultArtistFromFMApi = getArtistFromDatabase()
+        if(resultArtistFromFMApi != null)
             addStorePrefix()
         else
         {
-            resultArtistFromDatabase=artistToHTML()
+            resultArtistFromFMApi = fmApiInfoToHTML()
             saveArtistInDatabase()
         }
     }
 
-    private fun addStorePrefix(): String = STORE_LETTER.plus(resultArtistFromDatabase)
+    private fun addStorePrefix(): String = STORE_LETTER.plus(resultArtistFromFMApi)
 
-    private fun initArtistUI() {
+    private fun updateArtistInfoUI() {
         runOnUiThread {
             loadArtistImage()
             loadArtistText()
@@ -133,14 +133,14 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun loadArtistText() {
-        moreDetailsPane.text = Html.fromHtml(resultArtistFromDatabase)
+        moreDetailsPane.text = Html.fromHtml(resultArtistFromFMApi)
     }
 
     private fun getArtistFromDatabase(): String? {
         return dataBase.getInfo(artistName)
     }
 
-    private fun artistToHTML(): String {
+    private fun fmApiInfoToHTML(): String {
         setContentAndURL()
         assignArtistContent = bioContentToHTML()
         return assignArtistContent
