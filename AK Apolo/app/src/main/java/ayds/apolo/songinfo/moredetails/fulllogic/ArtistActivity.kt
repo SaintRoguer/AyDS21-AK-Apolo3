@@ -38,7 +38,7 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var apiBuilder: Retrofit
     private lateinit var buttonView: View
     private lateinit var imageView: ImageView
-    private var resultArtistFromFMApi: String? = null
+    private var artistInfo: String? = null
     private lateinit var lastFMAPI: LastFMAPI
     private lateinit var artistName: String
     private lateinit var jsonContent: JsonElement
@@ -109,17 +109,17 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun updateArtistInfo() {
-        resultArtistFromFMApi = getArtistFromDatabase()
-        if(resultArtistFromFMApi != null)
+        artistInfo = getArtistFromDatabase()
+        if(artistInfo != null)
             addStorePrefix()
         else
         {
-            resultArtistFromFMApi = fmApiInfoToHTML()
+            artistInfo = getArtistInfoFromLastFM()
             saveArtistInDatabase()
         }
     }
 
-    private fun addStorePrefix(): String = STORE_LETTER.plus(resultArtistFromFMApi)
+    private fun addStorePrefix(): String = STORE_LETTER.plus(artistInfo)
 
     private fun updateArtistInfoUI() {
         runOnUiThread {
@@ -133,14 +133,14 @@ class OtherInfoWindowActivity : AppCompatActivity() {
     }
 
     private fun loadArtistText() {
-        moreDetailsPane.text = Html.fromHtml(resultArtistFromFMApi)
+        moreDetailsPane.text = Html.fromHtml(artistInfo)
     }
 
     private fun getArtistFromDatabase(): String? {
         return dataBase.getInfo(artistName)
     }
 
-    private fun fmApiInfoToHTML(): String {
+    private fun getArtistInfoFromLastFM(): String {
         setContentAndURL()
         assignArtistContent = bioContentToHTML()
         return assignArtistContent
