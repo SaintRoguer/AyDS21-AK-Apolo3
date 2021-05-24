@@ -1,6 +1,6 @@
 package ayds.apolo.songinfo.moredetails.fulllogic.model
 
-import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsView
+import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsViewActivity
 
 object MoreDetailsModelModule {
 
@@ -8,7 +8,7 @@ object MoreDetailsModelModule {
 
     fun getMoreDetailsModel() : MoreDetailsModel = moreDetailsModel
 
-    fun initMoreDetailsModel(moreDetailsView : MoreDetailsView){
+    fun initMoreDetailsModel(moreDetailsView : MoreDetailsViewActivity){
 
     }
 

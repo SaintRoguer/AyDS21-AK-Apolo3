@@ -32,12 +32,9 @@ const val FONT_HTML = "<font face=\"arial\">"
 const val END_HTML = "</font></div></html>"
 
 class OtherInfoWindowActivity : AppCompatActivity() {
-    private lateinit var moreDetailsPane: TextView
     private lateinit var dataBase: ArtistTablesCreate
     private val builder = StringBuilder()
     private lateinit var apiBuilder: Retrofit
-    private lateinit var buttonView: View
-    private lateinit var imageView: ImageView
     private var artistInfo: String? = null
     private lateinit var lastFMAPI: LastFMAPI
     private lateinit var artistName: String
@@ -50,7 +47,6 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         setContentView(R.layout.activity_other_info)
 
         initDatabase()
-        initMoreDetailsPane()
         initProperties()
     }
 
@@ -58,17 +54,10 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         dataBase = ArtistTablesCreate(this)
     }
 
-    private fun initMoreDetailsPane() {
-        moreDetailsPane = findViewById(R.id.moreDetailsPane)
-    }
-
     private fun initProperties() {
         initApiBuilder()
         initArtistInfo()
-        initButtonView()
-        initImageView()
         initLastFMAPI()
-        initListeners()
     }
 
     private fun initApiBuilder() {
@@ -85,56 +74,12 @@ class OtherInfoWindowActivity : AppCompatActivity() {
         }
     }
 
-    private fun initButtonView() {
-        buttonView = findViewById(R.id.openUrlButton)
-    }
-
-    private fun initImageView() {
-        imageView = findViewById(R.id.imageView)
-    }
 
     private fun initLastFMAPI() {
         lastFMAPI = apiBuilder.create(LastFMAPI::class.java)
     }
 
-    private fun initListeners() {
-        initURLButtonListener()
-    }
-
-    private fun initArtistThread() {
-        Thread {
-            updateArtistInfo()
-            updateArtistInfoUI()
-        }.start()
-    }
-
-    private fun updateArtistInfo() {
-        artistInfo = getArtistFromDatabase()
-        if(artistInfo != null)
-            addStorePrefix()
-        else
-        {
-            artistInfo = getArtistInfoFromLastFM()
-            saveArtistInDatabase()
-        }
-    }
-
     private fun addStorePrefix(): String = STORE_LETTER.plus(artistInfo)
-
-    private fun updateArtistInfoUI() {
-        runOnUiThread {
-            loadArtistImage()
-            loadArtistText()
-        }
-    }
-
-    private fun loadArtistImage() {
-        Picasso.get().load(IMAGE_URL).into(imageView)
-    }
-
-    private fun loadArtistText() {
-        moreDetailsPane.text = Html.fromHtml(artistInfo)
-    }
 
     private fun getArtistFromDatabase(): String? {
         return dataBase.getInfo(artistName)
@@ -156,18 +101,6 @@ class OtherInfoWindowActivity : AppCompatActivity() {
 
     private fun bioContentToHTML(): String =
         textToHtml(jsonContent.asString.replace("\\n", "\n"), artistName)
-
-
-    private fun initURLButtonListener() =
-        buttonView.setOnClickListener {
-            openURLActivity()
-        }
-
-    private fun openURLActivity() {
-        val openUrlAction = Intent(Intent.ACTION_VIEW)
-        openUrlAction.data = Uri.parse(urlString)
-        startActivity(openUrlAction)
-    }
 
     private fun getResponseFromService(artistName: String): Response<String> =
         lastFMAPI.getArtistInfo(artistName).execute()

@@ -1,22 +1,20 @@
 package ayds.apolo.songinfo.moredetails.fulllogic.controller
 
-import ayds.apolo.songinfo.home.view.HomeUiEvent
 import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModel
-import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsView
-import ayds.observer.Observer
+import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsViewActivity
 
 
 interface MoreDetailsController{
-     fun setMoreDetailsView(moreDetailsView : MoreDetailsView)
+     fun setMoreDetailsView(moreDetailsView : MoreDetailsViewActivity)
 }
 
 internal class MoreDetailsControllerImpl(
     private val moreDetailsModel : MoreDetailsModel
 ) : MoreDetailsController{
 
-    private lateinit var moreDetailsView : MoreDetailsView
+    private lateinit var moreDetailsView : MoreDetailsViewActivity
 
-    override fun setMoreDetailsView(moreDetailsView: MoreDetailsView){
+    override fun setMoreDetailsView(moreDetailsView: MoreDetailsViewActivity){
         this.moreDetailsView = moreDetailsView
        // moreDetailsView.uiEventObservable.subscribe(observer)
     }
