@@ -7,22 +7,6 @@ import android.content.ContentValues
 import android.content.Context
 import java.util.ArrayList
 
-const val ARTISTS_COLUMN = "artists"
-const val ARTIST_COLUMN = "artist"
-const val ID_COLUMN = "id"
-const val INFO_COLUMN = "info"
-const val SOURCE_COLUMN = "source"
-const val ARTIST_DESC_COLUMN = "artist DESC"
-const val NAME_DATABASE = "dictionary.db"
-const val VERSION_DATABASE = 1
-
-const val onCreateString: String =
-    "create table $ARTISTS_COLUMN (" +
-            "$ID_COLUMN INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "$ARTIST_COLUMN string, " +
-            "$INFO_COLUMN string, " +
-            "$SOURCE_COLUMN string)"
-
 class ArtistTablesCreate(context: Context) : SQLiteOpenHelper(context, NAME_DATABASE, null, VERSION_DATABASE) {
 
     private val projection = arrayOf(INFO_COLUMN, ARTIST_COLUMN, INFO_COLUMN)

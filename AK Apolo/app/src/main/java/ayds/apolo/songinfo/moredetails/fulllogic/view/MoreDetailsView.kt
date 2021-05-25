@@ -15,6 +15,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.fulllogic.IMAGE_URL
+import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModel
+import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModelModule
 import ayds.observer.Observable
 import ayds.observer.Subject
 import com.squareup.picasso.Picasso
@@ -30,6 +32,7 @@ interface MoreDetailsView{
 class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView{
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
+    private lateinit var moreDetailsModel : MoreDetailsModel
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override val uiState: HomeUiState = HomeUiState()
@@ -52,6 +55,11 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView{
 
         initMoreDetailsPane()
         initProperties()
+    }
+
+    private fun initModule(){
+        MoreDetailsViewModule.init(this)
+        moreDetailsModel = MoreDetailsModelModule.getMoreDetailsModel()
     }
 
     private fun initProperties(){

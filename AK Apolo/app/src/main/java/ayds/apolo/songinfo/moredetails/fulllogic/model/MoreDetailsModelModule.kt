@@ -1,6 +1,7 @@
 package ayds.apolo.songinfo.moredetails.fulllogic.model
 
-import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsViewActivity
+import ayds.apolo.songinfo.moredetails.fulllogic.model.repository.local_spotify.ArtistLocalStorage
+import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsView
 
 object MoreDetailsModelModule {
 
@@ -8,8 +9,8 @@ object MoreDetailsModelModule {
 
     fun getMoreDetailsModel() : MoreDetailsModel = moreDetailsModel
 
-    fun initMoreDetailsModel(moreDetailsView : MoreDetailsViewActivity){
-
+    fun initMoreDetailsModel(moreDetailsView : MoreDetailsView){
+        //
     }
 
 }
