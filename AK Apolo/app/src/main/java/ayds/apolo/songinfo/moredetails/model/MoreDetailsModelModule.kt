@@ -4,12 +4,12 @@ import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
 
 object MoreDetailsModelModule {
 
-    private lateinit var moreDetailsModelImpl : MoreDetailsModelImpl
+    private lateinit var moreDetailsModel : MoreDetailsModel
 
-    fun getMoreDetailsModel() : MoreDetailsModelImpl = moreDetailsModelImpl
+    fun getMoreDetailsModel() : MoreDetailsModel = moreDetailsModel
 
     fun initMoreDetailsModel(moreDetailsView : MoreDetailsView){
-        //
+        //Aca se usa el lastFMInfoService del LastFMModule
     }
 
 }

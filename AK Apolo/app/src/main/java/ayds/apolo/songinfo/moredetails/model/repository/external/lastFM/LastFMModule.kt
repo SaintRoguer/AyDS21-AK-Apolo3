@@ -1,7 +1,9 @@
 package ayds.apolo.songinfo.moredetails.model.repository.external.lastFM
 
+import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.info.LastFMInfoModule
+
 
 object LastFMModule {
 
-    val LastFMService: LastFMService by lazy { LastFMService }
+    val lastFMInfoService: LastFMInfoService = LastFMInfoModule.lastFMInfoService
 }

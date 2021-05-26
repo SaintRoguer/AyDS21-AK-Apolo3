@@ -6,7 +6,7 @@ import com.google.gson.JsonObject
 import java.lang.Exception
 
 interface LastFMToInfoResolver {
-    fun getInfoFromExternalData(serviceData: String): String
+    fun getInfoFromExternalData(serviceData: String?): ArticleArtist?
 }
 const val DATA_ARTIST = "artist"
 const val ARTIST_NAME = "artistName"
@@ -15,9 +15,9 @@ const val DATA_URL = "url"
 
 internal class JsonToInfoResolver : LastFMToInfoResolver{
 
-    override fun getInfoFromExternalData(serviceData: String): ArticleArtist =
+    override fun getInfoFromExternalData(serviceData: String?): ArticleArtist? =
       try{
-          serviceData.getFirstItem().let { item->
+          serviceData?.getFirstItem()?.let { item->
               ArticleArtist(
                   item.getArtistName(), item.getArtistInfo(),
                   item.getArtistUrl(), false

@@ -12,7 +12,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.*
 
 const val ARTIST_NAME = "artistName"
-const val BASE_URL = "https://ws.audioscrobbler.com/2.0/"
+//const val BASE_URL = "https://ws.audioscrobbler.com/2.0/"
 const val DATA_ARTIST = "artist"
 const val DATA_BIO = "bio"
 const val DATA_URL = "url"
