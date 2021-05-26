@@ -8,9 +8,7 @@ interface ArtistLocalStorage {
     //ver como busca para corregir los parametros
     //fun updateArtistTerm(query: String, songId: String)
 
-    fun insertArtist(query: String, artistName: SpotifyArtist)
+    fun saveArtist(artist: String, info: String)
 
-    fun getArtistByTerm(term: String): SpotifyArtist?
-
-    fun getArtistByName(artistName: String): SpotifyArtist?
+    fun getInfo(artist: String): String?
 }
