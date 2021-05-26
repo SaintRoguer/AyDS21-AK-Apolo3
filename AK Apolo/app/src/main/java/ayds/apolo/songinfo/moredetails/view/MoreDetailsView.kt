@@ -1,22 +1,17 @@
-package ayds.apolo.songinfo.moredetails.fulllogic.view
+package ayds.apolo.songinfo.moredetails.view
 
 import androidx.appcompat.app.AppCompatActivity
-import ayds.apolo.songinfo.home.view.HomeUiEvent
 import ayds.apolo.songinfo.home.view.HomeUiState
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import ayds.apolo.songinfo.R
-import ayds.apolo.songinfo.moredetails.fulllogic.IMAGE_URL
-import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModel
-import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModelModule
+import ayds.apolo.songinfo.moredetails.IMAGE_URL
+import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelImpl
+import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.observer.Observable
 import ayds.observer.Subject
 import com.squareup.picasso.Picasso
@@ -29,10 +24,10 @@ interface MoreDetailsView{
     fun open()
 }
 
-class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView{
+class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
-    private lateinit var moreDetailsModel : MoreDetailsModel
+    private lateinit var moreDetailsModelImpl : MoreDetailsModelImpl
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override val uiState: HomeUiState = HomeUiState()
@@ -59,7 +54,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView{
 
     private fun initModule(){
         MoreDetailsViewModule.init(this)
-        moreDetailsModel = MoreDetailsModelModule.getMoreDetailsModel()
+        moreDetailsModelImpl = MoreDetailsModelModule.getMoreDetailsModel()
     }
 
     private fun initProperties(){

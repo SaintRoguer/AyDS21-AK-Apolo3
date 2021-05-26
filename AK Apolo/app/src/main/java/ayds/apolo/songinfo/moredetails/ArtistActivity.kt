@@ -1,18 +1,11 @@
-package ayds.apolo.songinfo.moredetails.fulllogic
+package ayds.apolo.songinfo.moredetails
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.text.Html
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import ayds.apolo.songinfo.R
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.squareup.picasso.Picasso
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -24,7 +17,7 @@ const val DATA_ARTIST = "artist"
 const val DATA_BIO = "bio"
 const val DATA_URL = "url"
 const val DATA_CONTENT = "content"
-const val STORE_LETTER = "*"
+const val STORE_LETTER = "[*]"
 const val IMAGE_URL =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
 const val START_HTML = "<html><div width=400>"

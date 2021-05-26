@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.fulllogic
+package ayds.apolo.songinfo.moredetails
 
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase

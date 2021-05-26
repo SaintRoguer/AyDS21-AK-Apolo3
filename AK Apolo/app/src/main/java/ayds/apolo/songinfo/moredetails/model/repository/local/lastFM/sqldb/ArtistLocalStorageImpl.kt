@@ -1,13 +1,11 @@
-package ayds.apolo.songinfo.moredetails.fulllogic.model.repository.local_spotify.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.sqldb
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import ayds.apolo.songinfo.home.model.repository.local.spotify.SpotifyLocalStorage
-import ayds.apolo.songinfo.moredetails.fulllogic.model.entities.SpotifyArtist
-import ayds.apolo.songinfo.moredetails.fulllogic.model.repository.local_spotify.ArtistLocalStorage
+import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
 import java.util.ArrayList
 
 private const val DATABASE_VERSION = 1

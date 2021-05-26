@@ -1,7 +1,7 @@
-package ayds.apolo.songinfo.moredetails.fulllogic.view
+package ayds.apolo.songinfo.moredetails.view
 
-import ayds.apolo.songinfo.moredetails.fulllogic.controller.MoreDetailsControllerModule
-import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModelModule
+import ayds.apolo.songinfo.moredetails.controller.MoreDetailsControllerModule
+import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 
 object MoreDetailsViewModule {
     //private val SongToReleaseDateFactory : SongToReleaseDateFactory = SongToReleaseDateFactoryImpl()

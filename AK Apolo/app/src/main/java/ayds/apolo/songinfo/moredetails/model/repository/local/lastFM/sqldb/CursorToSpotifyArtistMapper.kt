@@ -1,27 +1,24 @@
-package ayds.apolo.songinfo.moredetails.fulllogic.model.repository.local_spotify.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.sqldb
 
 import android.database.Cursor
-import ayds.apolo.songinfo.home.model.repository.local.spotify.sqldb.ID_COLUMN
-import ayds.apolo.songinfo.moredetails.fulllogic.model.entities.SpotifyArtist
+import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
 import java.sql.SQLException
 
 interface CursorToSpotifyArtistMapper {
 
-    fun map(cursor: Cursor): SpotifyArtist?
+    fun map(cursor: Cursor): ArticleArtist?
 }
 
 internal class CursorToSpotifySongMapperImpl : CursorToSpotifyArtistMapper {
 
-    override fun map(cursor: Cursor): SpotifyArtist? =
+    override fun map(cursor: Cursor): ArticleArtist? =
         try {
             with(cursor) {
                 if (moveToNext()) {
-                    SpotifyArtist(
-                        id = getString(getColumnIndexOrThrow(ID_COLUMN)),
+                    ArticleArtist(
                         artistName = getString(getColumnIndexOrThrow(ARTIST_COLUMN)),
                         artistInfo = getString(getColumnIndexOrThrow(INFO_COLUMN)),
-                        artistDesc = getString(getColumnIndexOrThrow(ARTIST_DESC_COLUMN)),
-                        artistSource = getString(getColumnIndexOrThrow(SOURCE_COLUMN))
+                        artistURL = getString(getColumnIndexOrThrow(ARTICLE_URL_COLUMN))
                     )
                 } else {
                     null

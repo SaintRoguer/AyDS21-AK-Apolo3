@@ -1,7 +1,7 @@
-package ayds.apolo.songinfo.moredetails.fulllogic.controller
+package ayds.apolo.songinfo.moredetails.controller
 
-import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModelModule
-import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsView
+import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
+import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
 
 object MoreDetailsControllerModule {
 

@@ -1,8 +1,7 @@
-package ayds.apolo.songinfo.moredetails.fulllogic.controller
+package ayds.apolo.songinfo.moredetails.controller
 
-import ayds.apolo.songinfo.moredetails.fulllogic.model.MoreDetailsModel
-import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsView
-import ayds.apolo.songinfo.moredetails.fulllogic.view.MoreDetailsViewActivity
+import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelImpl
+import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
 
 
 interface MoreDetailsController{
@@ -10,8 +9,8 @@ interface MoreDetailsController{
 }
 
 internal class MoreDetailsControllerImpl(
-    private val moreDetailsModel : MoreDetailsModel
-) : MoreDetailsController{
+    private val moreDetailsModelImpl : MoreDetailsModelImpl
+) : MoreDetailsController {
 
     private lateinit var moreDetailsView : MoreDetailsView
 

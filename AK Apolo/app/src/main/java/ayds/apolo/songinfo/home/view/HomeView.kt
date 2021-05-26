@@ -16,7 +16,7 @@ import ayds.apolo.songinfo.home.model.entities.EmptySong
 import ayds.apolo.songinfo.home.model.entities.Song
 import ayds.apolo.songinfo.home.model.entities.SpotifySong
 import ayds.apolo.songinfo.home.view.HomeUiState.Companion.DEFAULT_IMAGE
-import ayds.apolo.songinfo.moredetails.fulllogic.OtherInfoWindowActivity
+import ayds.apolo.songinfo.moredetails.OtherInfoWindowActivity
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.view.ImageLoader
