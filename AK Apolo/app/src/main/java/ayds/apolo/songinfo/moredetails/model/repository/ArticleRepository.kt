@@ -1,21 +1,20 @@
 package ayds.apolo.songinfo.moredetails.model.repository
 
 import android.util.Log
-import ayds.apolo.songinfo.home.model.entities.SpotifySong
 import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
 import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMService
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
 
 interface ArticleRepository {
-    fun getArticleByTerm(term: String): ArticleArtist
+    fun getArticleByArtistName(artistName: String): ArticleArtist
 }
 
 internal class ArticleRepositoryImpl(
     private val ArtistLocalStorage: ArtistLocalStorage,
     private val LastFMService: LastFMService,
 ): ArticleRepository{
-    override fun getArticleByTerm(artistName: String): ArticleArtist{
-        var artistArticle = ArtistLocalStorage.getArticleByTerm(artistName)
+    override fun getArticleByArtistName(artistName: String): ArticleArtist{
+        var artistArticle = ArtistLocalStorage.getArticleByArtistName(artistName)
 
         when{
             artistArticle != null -> markArticleAsLocal(artistArticle)
@@ -25,8 +24,8 @@ internal class ArticleRepositoryImpl(
 
                     artistArticle.let {
                         when {
-                            it.isSavedArticle() -> ArtistLocalStorage.updateArtist(artistName, it.id)
-                            else -> ArtistLocalStorage.insertArtist(artistName, it)
+                            it.isSavedArticle() -> ArtistLocalStorage.updateArtist(artistName, it.artistInfo)
+                            else -> ArtistLocalStorage.insertArtist(artistName, it.artistInfo)
                         }
                     }
                 } catch(e: Exception){
@@ -38,9 +37,9 @@ internal class ArticleRepositoryImpl(
         return artistArticle
     }
 
-    private fun ArticleArtist.isSavedArticle() = ArtistLocalStorage.getArticleByTerm(artistName) != null
+    private fun ArticleArtist.isSavedArticle() = ArtistLocalStorage.getArticleByArtistName(artistName) != null
 
-    private fun markArticleAsLocal(artistArticle: SpotifySong) {
+    private fun markArticleAsLocal(artistArticle: ArticleArtist) {
         artistArticle.isLocallyStoraged = true
     }
 }

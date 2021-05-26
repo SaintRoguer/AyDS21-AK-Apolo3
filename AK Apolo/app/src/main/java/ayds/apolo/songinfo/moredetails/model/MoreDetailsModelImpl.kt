@@ -18,7 +18,7 @@ internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
     private val articleSubject= Subject<ArticleArtist>()
 
     override fun searchArticle(artistName: String){
-        repository.getArticleByTerm(artistName)
+        repository.getArticleByArtistName(artistName)
     }
 
     override fun songObservable(): Observable<ArticleArtist> = articleSubject
