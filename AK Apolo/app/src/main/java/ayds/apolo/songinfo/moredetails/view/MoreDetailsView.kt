@@ -27,7 +27,7 @@ interface MoreDetailsView{
 class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
-    private lateinit var moreDetailsModelImpl : MoreDetailsModelImpl
+    private lateinit var moreDetailsModelImplImpl : MoreDetailsModelImpl
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override val uiState: HomeUiState = HomeUiState()
@@ -54,7 +54,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
 
     private fun initModule(){
         MoreDetailsViewModule.init(this)
-        moreDetailsModelImpl = MoreDetailsModelModule.getMoreDetailsModel()
+        moreDetailsModelImplImpl = MoreDetailsModelModule.getMoreDetailsModel()
     }
 
     private fun initProperties(){

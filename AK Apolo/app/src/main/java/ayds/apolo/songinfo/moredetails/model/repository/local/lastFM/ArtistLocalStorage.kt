@@ -12,7 +12,7 @@ interface ArtistLocalStorage {
 
     fun getInfo(artist: String): String?
 
-    fun getArticleByArtistName(artistName: String): ArticleArtist
+    fun getArticleByArtistName(artistName: String): ArticleArtist?
 
     //No se si es info lo que guardamos o sea que tipo es el artistArticle de ArticleRepository
     fun updateArtist(artistName: String,info: String )

@@ -4,12 +4,12 @@ import android.database.Cursor
 import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
 import java.sql.SQLException
 
-interface CursorToSpotifyArtistMapper {
+interface CursorToLastFMArtistMapper {
 
     fun map(cursor: Cursor): ArticleArtist?
 }
 
-internal class CursorToSpotifySongMapperImpl : CursorToSpotifyArtistMapper {
+internal class CursorToLastFMSongMapperImpl : CursorToLastFMArtistMapper {
 
     override fun map(cursor: Cursor): ArticleArtist? =
         try {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import ayds.apolo.songinfo.home.model.repository.local.spotify.sqldb.TERM_COLUMN
 import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
 import java.util.ArrayList
@@ -14,7 +15,7 @@ private const val DATABASE_NAME = "artists.db"
 
 internal class ArtistLocalStorageImpl(
     context: Context,
-    private val cursorToSpotifyArtistMapper: CursorToSpotifyArtistMapper,
+    private val cursorToSpotifyArtistMapper: CursorToLastFMArtistMapper,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION),
     ArtistLocalStorage {
 
@@ -54,8 +55,17 @@ internal class ArtistLocalStorageImpl(
         return items.firstOrNull()
     }
 
-    override fun getArticleByArtistName(artistName: String): ArticleArtist {
-        TODO("Not yet implemented")
+    override fun getArticleByArtistName(artistName: String): ArticleArtist? {
+        val cursor= readableDatabase.query(
+            ARTISTS_TABLE,
+            projection,
+            "$TERM_COLUMN = ?",
+            arrayOf(artistName),
+            null,
+            null,
+            null
+        )
+        return cursorToSpotifyArtistMapper.map(cursor)
     }
 
     override fun updateArtist(artistName: String, info: String) {
