@@ -5,5 +5,5 @@ import retrofit2.http.Query
 
 interface LastFMInfoService {
 
-    fun getArtistInfo(@Query("artist") artist: String): ArticleArtist?
+    fun getArtistInfo(@Query("artist") artist: String): ArticleArtist
 }

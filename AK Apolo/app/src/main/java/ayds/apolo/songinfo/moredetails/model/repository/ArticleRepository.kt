@@ -5,6 +5,8 @@ import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
 import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
 
+const val STORE_LETTER = "*"
+
 interface ArticleRepository {
     fun getArticleByArtistName(artistName: String): ArticleArtist
 }
@@ -41,5 +43,10 @@ internal class ArticleRepositoryImpl(
 
     private fun markArticleAsLocal(artistArticle: ArticleArtist) {
         artistArticle.isLocallyStoraged = true
+        addStorePrefix(artistArticle)
     }
+
+    private fun addStorePrefix(artistArticle: ArticleArtist): String = STORE_LETTER.plus(artistArticle)
+
+
 }
