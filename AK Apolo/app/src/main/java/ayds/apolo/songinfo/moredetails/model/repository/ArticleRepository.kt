@@ -2,32 +2,35 @@ package ayds.apolo.songinfo.moredetails.model.repository
 
 import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
+import ayds.apolo.songinfo.moredetails.model.entities.Article
+import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
 import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
 
 const val STORE_LETTER = "*"
 
 interface ArticleRepository {
-    fun getArticleByArtistName(artistName: String): ArticleArtist
+    fun getArticleByArtistName(artistName: String): Article
 }
 
 internal class ArticleRepositoryImpl(
-    private val ArtistLocalStorage: ArtistLocalStorage,
-    private val LastFMInfoService: LastFMInfoService,
+    private val artistLocalStorage: ArtistLocalStorage,
+    private val lastFMInfoService: LastFMInfoService,
 ): ArticleRepository{
-    override fun getArticleByArtistName(artistName: String): ArticleArtist{
-        var artistArticle = ArtistLocalStorage.getArticleByArtistName(artistName)
+
+    override fun getArticleByArtistName(artistName: String): Article {
+        var artistArticle = artistLocalStorage.getArticleByArtistName(artistName)
 
         when{
             artistArticle != null -> markArticleAsLocal(artistArticle)
             else ->{
                 try {
-                    artistArticle = LastFMInfoService.getArtistInfo(artistName)
+                    artistArticle = lastFMInfoService.getArtistInfo(artistName)
 
-                    artistArticle.let {
+                    artistArticle?.let {
                         when {
-                            it.isSavedArticle() -> ArtistLocalStorage.updateArtist(artistName, it.artistInfo)
-                            else -> ArtistLocalStorage.insertArtist(artistName, it.artistInfo)
+                            it.isSavedArticle() -> artistLocalStorage.updateArtist(artistName, it.artistInfo)
+                            else -> artistLocalStorage.insertArtist(artistName, it.artistInfo)
                         }
                     }
                 } catch(e: Exception){
@@ -36,10 +39,10 @@ internal class ArticleRepositoryImpl(
             }
         }
         Log.e("Artist Article", "Article $artistArticle")
-        return artistArticle
+        return artistArticle ?: EmptyArticle
     }
 
-    private fun ArticleArtist.isSavedArticle() = ArtistLocalStorage.getArticleByArtistName(artistName) != null
+    private fun ArticleArtist.isSavedArticle() = artistLocalStorage.getArticleByArtistName(artistName) != null
 
     private fun markArticleAsLocal(artistArticle: ArticleArtist) {
         artistArticle.isLocallyStoraged = true
