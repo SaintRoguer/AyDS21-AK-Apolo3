@@ -1,7 +1,6 @@
 package ayds.apolo.songinfo.moredetails.view
 
 import androidx.appcompat.app.AppCompatActivity
-import ayds.apolo.songinfo.home.view.HomeUiState
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
@@ -9,16 +8,31 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import ayds.apolo.songinfo.R
-import ayds.apolo.songinfo.moredetails.IMAGE_URL
-import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelImpl
+import ayds.apolo.songinfo.moredetails.*
+import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
+import ayds.apolo.songinfo.moredetails.model.entities.Article
+import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
+import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
+import ayds.apolo.songinfo.utils.UtilsModule
+import ayds.apolo.songinfo.utils.view.ImageLoader
 import ayds.observer.Observable
 import ayds.observer.Subject
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.squareup.picasso.Picasso
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.util.*
+
+private const val IMAGE_URL =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+private const val LASTFM_URL = "https://ws.audioscrobbler.com/2.0/"
 
 interface MoreDetailsView{
     val uiEventObservable : Observable<MoreDetailsUiEvent>
-    val uiState : HomeUiState
+    val uiState : MoreDetailsUiState
 
     fun navigate()
     fun open()
@@ -27,14 +41,18 @@ interface MoreDetailsView{
 class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
-    private lateinit var moreDetailsModelImplImpl : MoreDetailsModelImpl
+    private lateinit var moreDetailsModel : MoreDetailsModel
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
-    override val uiState: HomeUiState = HomeUiState()
+    override var uiState: MoreDetailsUiState = MoreDetailsUiState()
+
+    private val imageLoader : ImageLoader = UtilsModule.imageLoader
+    private lateinit var apiBuilder: Retrofit
 
     private lateinit var moreDetailsPane: TextView
     private lateinit var buttonView: View
     private lateinit var imageView: ImageView
+
 
     override fun navigate() {
         TODO("Not yet implemented")
@@ -48,31 +66,25 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
 
-        initMoreDetailsPane()
+        initModule()
         initProperties()
+        initListeners()
+        initObservers()
+        initApiBuilder()
     }
+
 
     private fun initModule(){
         MoreDetailsViewModule.init(this)
-        moreDetailsModelImplImpl = MoreDetailsModelModule.getMoreDetailsModel()
+        moreDetailsModel = MoreDetailsModelModule.getMoreDetailsModel()
     }
 
     private fun initProperties(){
-        initButtonView()
-        initImageView()
-        initListeners()
-    }
-    private fun initButtonView() {
         buttonView = findViewById(R.id.openUrlButton)
-    }
-
-    private fun initImageView() {
         imageView = findViewById(R.id.imageView)
-    }
-
-    private fun initMoreDetailsPane() {
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
     }
+
 
     private fun initListeners() {
         initURLButtonListener()
@@ -83,13 +95,43 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
             openURLActivity()
         }
 
-
-    private fun loadArtistImage() {
-        Picasso.get().load(IMAGE_URL).into(imageView)
+    private fun initApiBuilder() {
+        apiBuilder = Retrofit.Builder()
+            .baseUrl(LASTFM_URL)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
     }
 
-    private fun loadArtistText() {
-        moreDetailsPane.text = Html.fromHtml(artistInfo)
+    private fun initObservers(){
+        moreDetailsModel.articleObservable()
+            .subscribe{
+                value -> updateArticle(value)
+            }
+    }
+
+    private fun updateArticle(article : Article){
+        updateUiState(article)
+    }
+
+    private fun updateUiState(article : Article){
+        when (article){
+            is ArtistArticle -> updateArticleUiState(article)
+            EmptyArticle -> updateNoResultsUiState()
+        }
+    }
+
+    private fun updateArticleUiState(article : Article){
+    /*    uiState = uiState.copy(
+            artistName = article.artistName,
+            artistURL = article.artistURL
+        )*/
+    }
+
+    private fun updateNoResultsUiState(){
+     /*   uiState = uiState.copy(
+            artistName = "",
+            artistURL = "",
+        )*/
     }
 
     private fun initArtistThread() {
@@ -99,7 +141,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         }.start()
     }
 
-    //Los update los puse aca porque segun dice el grafico van aca, pero
+    //Los updatese los puse aca porque gun dice el grafico van aca, pero
     //habria los get se le hacen al model
     private fun updateArtistInfo() {
         artistInfo = getArtistFromDatabase()
@@ -128,4 +170,68 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         startActivity(openUrlAction)
     }
 
+    private fun initArtistInfo() {
+        artistName = (intent.getStringExtra(ARTIST_NAME)).toString()
+        artistName?.let {
+            initArtistThread()
+        }
+    }
+
+    private fun addStorePrefix(): String = STORE_LETTER.plus(artistInfo)
+
+    private fun getArtistFromDatabase(): String? {
+        return dataBase.getInfo(artistName)
+    }
+
+    private fun getArtistInfoFromLastFM(): String {
+        setContentAndURL()
+        assignArtistContent = bioContentToHTML()
+        return assignArtistContent
+    }
+
+    private fun setContentAndURL() {
+        parseFromJson(getResponseFromService(artistName))
+    }
+
+    private fun saveArtistInDatabase() {
+        dataBase.saveArtist(artistName, assignArtistContent)
+    }
+
+    private fun bioContentToHTML(): String =
+        textToHtml(jsonContent.asString.replace("\\n", "\n"), artistName)
+
+    private fun getResponseFromService(artistName: String): Response<String> =
+        lastFMAPI.getArtistInfo(artistName).execute()
+
+
+    private fun parseFromJson(callResponse: Response<String>) {
+        val artistJson = getArtistJson(callResponse)
+        jsonContent = artistJson[DATA_BIO].asJsonObject[DATA_CONTENT]
+        urlString = artistJson[DATA_URL].asString
+    }
+
+    private fun getArtistJson(callResponse: Response<String>): JsonObject {
+        val gson = Gson()
+        val jObj = gson.fromJson(callResponse.body(), JsonObject::class.java)
+        return jObj[DATA_ARTIST].asJsonObject
+    }
+
+    private fun textToHtml(text: String, term: String): String {
+        builder.append(START_HTML)
+        builder.append(FONT_HTML)
+        val textFormatted = formatText(term, text)
+        builder.append(textFormatted)
+        builder.append(END_HTML)
+        return builder.toString()
+    }
+
+    private fun formatText(term: String, text: String): String {
+        return text
+            .replace("'", " ")
+            .replace("\n", "<br>")
+            .replace(
+                "(?i)" + term.toRegex(),
+                "<b>" + term.toUpperCase(Locale.getDefault()) + "</b>"
+            )
+    }
 }

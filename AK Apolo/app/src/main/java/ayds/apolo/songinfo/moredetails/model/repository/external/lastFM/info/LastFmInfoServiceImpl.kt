@@ -1,6 +1,6 @@
 package ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.info
 
-import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
+import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
 import retrofit2.Response
 
@@ -10,8 +10,8 @@ internal class LastFmInfoServiceImpl(
 ):LastFMInfoService {
 
 
-    override fun getArtistInfo(artist: String): ArticleArtist? {
-        val callResponse = getResponseFromService(artist);
+    override fun getArtistInfo(artist: String): ArtistArticle? {
+        val callResponse = getResponseFromService(artist)
         return lastFMToInfoResolver.getInfoFromExternalData(callResponse.body())
     }
 

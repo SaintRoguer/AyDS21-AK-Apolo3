@@ -7,7 +7,7 @@ interface Article {
     var isLocallyStoraged: Boolean
 }
 
-data class ArticleArtist(
+data class ArtistArticle(
     override val artistName: String,
     override var artistInfo: String,
     override val artistURL: String,

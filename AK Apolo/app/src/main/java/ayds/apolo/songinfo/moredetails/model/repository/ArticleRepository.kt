@@ -1,7 +1,7 @@
 package ayds.apolo.songinfo.moredetails.model.repository
 
 import android.util.Log
-import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
+import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
 import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
@@ -42,14 +42,14 @@ internal class ArticleRepositoryImpl(
         return artistArticle ?: EmptyArticle
     }
 
-    private fun ArticleArtist.isSavedArticle() = artistLocalStorage.getArticleByArtistName(artistName) != null
+    private fun ArtistArticle.isSavedArticle() = artistLocalStorage.getArticleByArtistName(artistName) != null
 
-    private fun markArticleAsLocal(artistArticle: ArticleArtist) {
+    private fun markArticleAsLocal(artistArticle: ArtistArticle) {
         artistArticle.isLocallyStoraged = true
         addStorePrefix(artistArticle)
     }
 
-    private fun addStorePrefix(artistArticle: ArticleArtist): String = STORE_LETTER.plus(artistArticle)
+    private fun addStorePrefix(artistArticle: ArtistArticle): String = STORE_LETTER.plus(artistArticle)
 
 
 }

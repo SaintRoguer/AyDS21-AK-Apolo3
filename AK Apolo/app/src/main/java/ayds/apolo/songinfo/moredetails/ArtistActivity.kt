@@ -18,8 +18,6 @@ const val DATA_BIO = "bio"
 const val DATA_URL = "url"
 const val DATA_CONTENT = "content"
 const val STORE_LETTER = "[*]"
-const val IMAGE_URL =
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
 const val START_HTML = "<html><div width=400>"
 const val FONT_HTML = "<font face=\"arial\">"
 const val END_HTML = "</font></div></html>"
@@ -27,7 +25,7 @@ const val END_HTML = "</font></div></html>"
 class OtherInfoWindowActivity : AppCompatActivity() {
     private lateinit var dataBase: ArtistTablesCreate
     private val builder = StringBuilder()
-    private lateinit var apiBuilder: Retrofit
+
     private var artistInfo: String? = null
     private lateinit var lastFMAPI: LastFMAPI
     private lateinit var artistName: String

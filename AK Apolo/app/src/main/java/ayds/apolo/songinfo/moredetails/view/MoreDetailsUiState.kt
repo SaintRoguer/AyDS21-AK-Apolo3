@@ -1,4 +1,7 @@
 package ayds.apolo.songinfo.moredetails.view
 
-class MoreDetailsUiState {
+class MoreDetailsUiState (
+    val artistName: String = "",
+    val artistURL: String = ""
+){
 }

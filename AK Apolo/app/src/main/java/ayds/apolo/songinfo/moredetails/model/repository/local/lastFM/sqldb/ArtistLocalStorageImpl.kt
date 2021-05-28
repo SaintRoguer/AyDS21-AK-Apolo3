@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ayds.apolo.songinfo.home.model.repository.local.spotify.sqldb.TERM_COLUMN
-import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
+import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
 import java.util.ArrayList
 
@@ -55,7 +55,7 @@ internal class ArtistLocalStorageImpl(
         return items.firstOrNull()
     }
 
-    override fun getArticleByArtistName(artistName: String): ArticleArtist? {
+    override fun getArticleByArtistName(artistName: String): ArtistArticle? {
         val cursor= readableDatabase.query(
             ARTISTS_TABLE,
             projection,

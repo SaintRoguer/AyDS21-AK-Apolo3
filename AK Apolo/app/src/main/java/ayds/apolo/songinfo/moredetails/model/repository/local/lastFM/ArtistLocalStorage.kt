@@ -1,7 +1,6 @@
 package ayds.apolo.songinfo.moredetails.model.repository.local.lastFM
 
-import ayds.apolo.songinfo.home.model.entities.SpotifySong
-import ayds.apolo.songinfo.moredetails.model.entities.ArticleArtist
+import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 
 interface ArtistLocalStorage {
 
@@ -12,7 +11,7 @@ interface ArtistLocalStorage {
 
     fun getInfo(artist: String): String?
 
-    fun getArticleByArtistName(artistName: String): ArticleArtist?
+    fun getArticleByArtistName(artistName: String): ArtistArticle?
 
     //No se si es info lo que guardamos o sea que tipo es el artistArticle de ArticleRepository
     fun updateArtist(artistName: String,info: String )
