@@ -1,6 +1,7 @@
 package ayds.apolo.songinfo.moredetails.controller
 
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
+import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsUiEvent
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
 import ayds.observer.Observer
@@ -17,19 +18,26 @@ internal class MoreDetailsControllerImpl(
 
     override fun setMoreDetailsView(moreDetailsView: MoreDetailsView){
         this.moreDetailsView = moreDetailsView
-       // moreDetailsView.uiEventObservable.subscribe(observer)
+        moreDetailsView.uiEventObservable.subscribe(observer)
     }
-    /**Habra que hacer este observer teniendo el de spotify,
-     * de ultima le preguntamos a emma, en las 2 clases que tenemos, no lo veo.
-     **/
-/*  private val observer: Observer<HomeUiEvent> =
-        Observer { value ->
-            when (value) {
-                HomeUiEvent.Search -> searchSong()
-                HomeUiEvent.MoreDetails -> moreDetails()
-                is HomeUiEvent.OpenSongUrl -> openSongUrl()
-            }
-        }*/
 
+    private val observer: Observer<MoreDetailsUiEvent> =
+        Observer {
+            viewFullArticle()
+        }
 
+    private fun viewFullArticle(){
+        Thread{
+            showFullArticle()
+        }
+    }
+
+    private fun showFullArticle(){
+        val article = getArticleFromModel()
+        moreDetailsView.getArtistInfo(article.artistInfo,article.artistName)
+        moreDetailsView.updateArticle(article)
+    }
+
+    private fun getArticleFromModel() : Article =
+        moreDetailsModel.viewFullArticle(moreDetailsView.uiState.artistName)
 }

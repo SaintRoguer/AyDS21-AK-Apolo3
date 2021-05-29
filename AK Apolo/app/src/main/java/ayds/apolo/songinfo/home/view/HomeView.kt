@@ -16,7 +16,7 @@ import ayds.apolo.songinfo.home.model.entities.EmptySong
 import ayds.apolo.songinfo.home.model.entities.Song
 import ayds.apolo.songinfo.home.model.entities.SpotifySong
 import ayds.apolo.songinfo.home.view.HomeUiState.Companion.DEFAULT_IMAGE
-import ayds.apolo.songinfo.moredetails.OtherInfoWindowActivity
+import ayds.apolo.songinfo.moredetails.view.MoreDetailsViewActivity
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.view.ImageLoader
@@ -49,8 +49,8 @@ class HomeViewActivity : AppCompatActivity(), HomeView {
     override var uiState: HomeUiState = HomeUiState()
 
     override fun navigateToOtherDetails(artistName: String) {
-        val intent = Intent(this, OtherInfoWindowActivity::class.java)
-        intent.putExtra(OtherInfoWindowActivity.ARTIST_NAME_EXTRA, artistName)
+        val intent = Intent(this, MoreDetailsViewActivity::class.java)
+        intent.putExtra(MoreDetailsViewActivity.ARTIST_NAME_EXTRA, artistName)
         startActivity(intent)
     }
 
@@ -186,4 +186,5 @@ class HomeViewActivity : AppCompatActivity(), HomeView {
             openSongButton.isEnabled = enable
         }
     }
+
 }

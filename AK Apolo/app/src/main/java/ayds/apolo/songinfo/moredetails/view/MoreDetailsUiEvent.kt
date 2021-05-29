@@ -1,4 +1,6 @@
 package ayds.apolo.songinfo.moredetails.view
 
-class MoreDetailsUiEvent {
+
+sealed class MoreDetailsUiEvent {
+    object ViewFullArticle : MoreDetailsUiEvent()
 }

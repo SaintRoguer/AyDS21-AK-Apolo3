@@ -12,6 +12,8 @@ interface MoreDetailsModel{
 
     fun articleObservable(): Observable<Article>
 
+    fun viewFullArticle(artistName : String) : Article
+
 }
 
 internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
@@ -27,5 +29,8 @@ internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
     }
 
     override fun articleObservable(): Observable<Article> = articleSubject
+
+    override fun viewFullArticle(artistName: String) : Article =
+        repository.getArticleByArtistName(artistName)
 
 }
