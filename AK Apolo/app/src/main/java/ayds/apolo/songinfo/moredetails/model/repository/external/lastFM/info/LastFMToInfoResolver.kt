@@ -21,7 +21,6 @@ internal class JsonToInfoResolver : LastFMToInfoResolver{
               ArtistArticle(
                   item.getArtistName(), item.getArtistInfo(),
                   item.getArtistUrl(), false
-
               )
           }
       } catch (e: Exception){
@@ -30,15 +29,16 @@ internal class JsonToInfoResolver : LastFMToInfoResolver{
 
       private fun String?.getFirstItem(): JsonObject {
           val jobj = Gson().fromJson(this,JsonObject::class.java)
-          return jobj[DATA_ARTIST].asJsonObject
+          val items= jobj[DATA_ARTIST].asJsonArray
+          return items[0].asJsonObject
 
       }
 
-    private fun JsonObject.getArtistName() = this[ARTIST_NAME].toString()
+    private fun JsonObject.getArtistName() = this[ARTIST_NAME].asString
     //info es bio en el model ArticleArtist?
-    private fun JsonObject.getArtistInfo() = this[DATA_BIO].toString()
+    private fun JsonObject.getArtistInfo() = this[DATA_BIO].asString
 
-    private fun JsonObject.getArtistUrl() = this[DATA_URL].toString()
+    private fun JsonObject.getArtistUrl() = this[DATA_URL].asString
 
 
 

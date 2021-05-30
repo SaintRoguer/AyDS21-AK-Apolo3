@@ -4,11 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.util.Log
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import ayds.apolo.songinfo.R
-import ayds.apolo.songinfo.moredetails.*
+import ayds.apolo.songinfo.home.view.HomeUiEvent
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Article
@@ -18,11 +19,8 @@ import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.apolo.songinfo.utils.view.ImageLoader
 import ayds.observer.Observable
 import ayds.observer.Subject
-import com.squareup.picasso.Picasso
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import java.util.*
 
 private const val IMAGE_URL =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
@@ -35,6 +33,7 @@ interface MoreDetailsView{
 
     fun getArtistInfo(text: String, term: String): String
     fun updateArticle(article : Article)
+    fun openURLActivity()
 }
 
 class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
@@ -50,7 +49,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     private val helperArticleInfo: ArticleHelper = ArticleHelperImpl()
 
     private lateinit var moreDetailsPane: TextView
-    private lateinit var buttonView: View
+    private lateinit var moreDetailsButton: Button
     private lateinit var imageView: ImageView
 
     override fun onCreate(savedInstanceState : Bundle?){
@@ -70,21 +69,24 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     }
 
     private fun initProperties(){
-        buttonView = findViewById(R.id.openUrlButton)
-        imageView = findViewById(R.id.imageView)
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
+        moreDetailsButton = findViewById(R.id.openUrlButton)
+        imageView = findViewById(R.id.imageView)
     }
 
     private fun initListeners() {
         initURLButtonListener()
     }
 
-    private fun initURLButtonListener() =
-        buttonView.setOnClickListener {
+    private fun initURLButtonListener() {
+
+        moreDetailsButton.setOnClickListener {
+            notifyFullArticleAction()
             openURLActivity()
         }
+    }
 
-    private fun openURLActivity() {
+    override fun openURLActivity() {
         val openUrlAction = Intent(Intent.ACTION_VIEW)
         openUrlAction.data = Uri.parse(uiState.artistURL)
         startActivity(openUrlAction)
@@ -102,6 +104,14 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
             .subscribe{
                 value -> updateArticle(value)
             }
+    }
+
+    private fun notifyFullArticleAction() {
+
+        Log.e("HOLAAAAAAAAAAAAAAAAAAAA", "ENTREEEEEEEEEEEEEEEE 0")
+        onActionSubject.notify(MoreDetailsUiEvent.ViewFullArticle)
+
+        Log.e("HOLAAAAAAAAAAAAAAAAAAAA", "ENTREEEEEEEEEEEEEEEE 1")
     }
 
     override fun getArtistInfo(text: String, term: String): String =

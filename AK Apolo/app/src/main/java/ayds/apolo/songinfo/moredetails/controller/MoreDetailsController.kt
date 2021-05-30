@@ -22,16 +22,20 @@ internal class MoreDetailsControllerImpl(
     }
 
     private val observer: Observer<MoreDetailsUiEvent> =
-        Observer {
-            viewFullArticle()
+        Observer { value ->
+            when(value){
+                MoreDetailsUiEvent.ViewFullArticle -> viewFullArticle()
+            }
         }
 
     private fun viewFullArticle(){
         Thread{
-            showFullArticle()
-        }
+            moreDetailsModel.viewFullArticle(moreDetailsView.uiState.artistName)
+        }.start()
     }
 
+
+/*
     private fun showFullArticle(){
         val article = getArticleFromModel()
         moreDetailsView.getArtistInfo(article.artistInfo,article.artistName)
@@ -40,4 +44,6 @@ internal class MoreDetailsControllerImpl(
 
     private fun getArticleFromModel() : Article =
         moreDetailsModel.viewFullArticle(moreDetailsView.uiState.artistName)
+
+ */
 }
