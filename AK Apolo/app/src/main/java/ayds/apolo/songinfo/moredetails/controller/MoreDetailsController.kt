@@ -29,13 +29,13 @@ internal class MoreDetailsControllerImpl(
         }
 
     private fun searchArticle() {
-        moreDetailsModel.searchArticle(moreDetailsView.uiState.artistName)
+        Thread {
+            moreDetailsModel.searchArticle(moreDetailsView.uiState.artistName)
+        }.start()
     }
 
     private fun viewFullArticle(){
-        Thread{
             moreDetailsModel.viewFullArticle(moreDetailsView.uiState.articleURL)
-        }.start()
     }
 
 

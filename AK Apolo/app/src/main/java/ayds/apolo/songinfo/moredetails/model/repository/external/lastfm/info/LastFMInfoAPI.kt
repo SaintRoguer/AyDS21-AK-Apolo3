@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.info
+package ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.info
 
 import retrofit2.http.*
 import retrofit2.Call

@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
 
 import android.database.Cursor
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
@@ -18,7 +18,7 @@ internal class CursorToLastFMSongMapperImpl : CursorToLastFMArtistMapper {
                     ArtistArticle(
                         artistName = getString(getColumnIndexOrThrow(ARTIST_COLUMN)),
                         artistInfo = getString(getColumnIndexOrThrow(INFO_COLUMN)),
-                        artistURL = getString(getColumnIndexOrThrow(ARTICLE_URL_COLUMN))
+                        artistURL = getString(getColumnIndexOrThrow(SOURCE_COLUMN))
                     )
                 } else {
                     null

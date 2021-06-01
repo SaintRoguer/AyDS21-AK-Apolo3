@@ -14,12 +14,11 @@ import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
+import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb.CursorToLastFMArtistMapper
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.apolo.songinfo.utils.view.ImageLoader
 import ayds.observer.Observable
 import ayds.observer.Subject
-import retrofit2.Retrofit
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 private const val IMAGE_URL =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
@@ -35,7 +34,7 @@ interface MoreDetailsView{
     fun openURLActivity()
 }
 
-class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
+class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
     private lateinit var moreDetailsModel : MoreDetailsModel
@@ -44,8 +43,8 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     override var uiState: MoreDetailsUiState = MoreDetailsUiState()
 
     private val imageLoader : ImageLoader = UtilsModule.imageLoader
-    private lateinit var apiBuilder: Retrofit
-    private val helperArticleInfo: ArticleHelper = ArticleHelperImpl()
+
+    private val helperArticleInfo: ArticleHelper = MoreDetailsViewModule.helperArticleInfo
 
     private lateinit var moreDetailsPane: TextView
     private lateinit var moreDetailsButton: Button
@@ -57,9 +56,9 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
 
         initModule()
         initProperties()
+        initArtistName()
         initListeners()
         initObservers()
-        initApiBuilder()
         notifyCreated()
     }
 
@@ -78,12 +77,16 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         imageView = findViewById(R.id.imageView)
     }
 
+    private fun initArtistName() {
+        uiState = uiState.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
+        uiState = uiState.copy(articleURL = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
+    }
+
     private fun initListeners() {
         initURLButtonListener()
     }
 
     private fun initURLButtonListener() {
-
         moreDetailsButton.setOnClickListener {
             notifyFullArticleAction()
             openURLActivity()
@@ -96,13 +99,6 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         startActivity(openUrlAction)
     }
 
-    private fun initApiBuilder() {
-        apiBuilder = Retrofit.Builder()
-            .baseUrl(LASTFM_URL)
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .build()
-    }
-
     private fun initObservers(){
         moreDetailsModel.articleObservable()
             .subscribe{
@@ -111,11 +107,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     }
 
     private fun notifyFullArticleAction() {
-
-        Log.e("HOLAAAAAAAAAAAAAAAAAAAA", "ENTREEEEEEEEEEEEEEEE 0")
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullArticle)
-
-        Log.e("HOLAAAAAAAAAAAAAAAAAAAA", "ENTREEEEEEEEEEEEEEEE 1")
     }
 
     override fun getArtistInfo(text: String, term: String): String =
@@ -137,7 +129,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         uiState = uiState.copy(
             artistName = article.artistName,
             articleURL = article.artistURL,
-            articleInfo = article.artistInfo
+            artistInfo = article.artistInfo
         )
     }
 
@@ -145,15 +137,15 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         uiState = uiState.copy(
             artistName = "",
             articleURL = "",
-            articleInfo = ""
+            artistInfo = ""
         )
     }
 
     private fun updateArtistInfoUI() {
-        Thread {
+        runOnUiThread {
             loadLastFMImage()
             loadArtistInfo()
-        }.start()
+        }
     }
 
     private fun loadLastFMImage() {
@@ -161,7 +153,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     }
 
     private fun loadArtistInfo() {
-        moreDetailsPane.text = uiState.articleInfo
+        moreDetailsPane.text = uiState.artistInfo
     }
 
     companion object {

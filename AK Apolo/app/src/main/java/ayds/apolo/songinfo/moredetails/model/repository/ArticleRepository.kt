@@ -4,8 +4,8 @@ import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
-import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
-import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
+import ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.LastFMInfoService
+import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
 
 const val STORE_LETTER = "*"
 
@@ -20,7 +20,6 @@ internal class ArticleRepositoryImpl(
 
     override fun getArticleByArtistName(artistName: String): Article {
         var artistArticle = artistLocalStorage.getArticleByArtistName(artistName)
-
         when{
             artistArticle != null -> markArticleAsLocal(artistArticle)
             else ->{
@@ -29,12 +28,12 @@ internal class ArticleRepositoryImpl(
 
                     artistArticle?.let {
                         when {
-                            it.isSavedArticle() -> artistLocalStorage.updateArtist(artistName, it.artistInfo)
-                            else -> artistLocalStorage.insertArtist(artistName, it.artistInfo)
+                            !it.isSavedArticle()
+                                -> artistLocalStorage.saveArticle(artistName, it.artistInfo)
                         }
                     }
                 } catch(e: Exception){
-                    Log.e("Artist Article","ERROR: $e")
+                    //Log.e("Artist Article","ERROR: $e")
                 }
             }
         }

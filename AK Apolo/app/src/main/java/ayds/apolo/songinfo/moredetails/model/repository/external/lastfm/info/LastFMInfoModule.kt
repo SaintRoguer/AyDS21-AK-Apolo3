@@ -1,6 +1,6 @@
-package ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.info
+package ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.info
 
-import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
+import ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.LastFMInfoService
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 

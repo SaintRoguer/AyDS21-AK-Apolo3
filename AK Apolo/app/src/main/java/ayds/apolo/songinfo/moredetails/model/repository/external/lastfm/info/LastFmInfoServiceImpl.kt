@@ -1,14 +1,14 @@
-package ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.info
+package ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.info
 
+import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
-import ayds.apolo.songinfo.moredetails.model.repository.external.lastFM.LastFMInfoService
+import ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.LastFMInfoService
 import retrofit2.Response
 
 internal class LastFmInfoServiceImpl(
     private val lastFMInfoAPI: LastFMInfoAPI,
     private val lastFMToInfoResolver: LastFMToInfoResolver
 ):LastFMInfoService {
-
 
     override fun getArtistInfo(artist: String): ArtistArticle? {
         val callResponse = getResponseFromService(artist)

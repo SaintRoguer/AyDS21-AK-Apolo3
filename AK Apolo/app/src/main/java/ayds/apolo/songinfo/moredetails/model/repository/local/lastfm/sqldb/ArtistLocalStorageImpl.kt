@@ -1,13 +1,12 @@
-package ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import ayds.apolo.songinfo.home.model.repository.local.spotify.sqldb.TERM_COLUMN
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
-import ayds.apolo.songinfo.moredetails.model.repository.local.lastFM.ArtistLocalStorage
+import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
 import java.util.ArrayList
 
 private const val DATABASE_VERSION = 1
@@ -15,15 +14,15 @@ private const val DATABASE_NAME = "artists.db"
 
 internal class ArtistLocalStorageImpl(
     context: Context,
-    private val cursorToSpotifyArtistMapper: CursorToLastFMArtistMapper,
+    private val cursorToLastFMArtistMapper: CursorToLastFMArtistMapper,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION),
     ArtistLocalStorage {
 
     private val projection = arrayOf(
         ARTIST_COLUMN,
+        ID_COLUMN,
         SOURCE_COLUMN,
-        INFO_COLUMN,
-        ARTIST_DESC_COLUMN
+        INFO_COLUMN
     )
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -36,7 +35,7 @@ internal class ArtistLocalStorageImpl(
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    override fun saveArtist(artist: String, info: String) {
+    override fun saveArticle(artist: String, info: String) {
         val artistInfoArray = arrayOf(artist, info)
         val column=fillDatabaseWithNewRow(artistInfoArray)
         this.writableDatabase.insert(ARTISTS_TABLE, null, column)
@@ -48,32 +47,17 @@ internal class ArtistLocalStorageImpl(
         put(SOURCE_COLUMN, 1)
     }
 
-    override fun getInfo(artist: String): String? {
-        val cursor: Cursor = newArtistCursor(artist)
-        val items = getArtistItems(cursor)
-        cursor.close()
-        return items.firstOrNull()
-    }
-
     override fun getArticleByArtistName(artistName: String): ArtistArticle? {
         val cursor= readableDatabase.query(
             ARTISTS_TABLE,
             projection,
-            "$TERM_COLUMN = ?",
+            "$ARTIST_COLUMN = ?",
             arrayOf(artistName),
             null,
             null,
             null
         )
-        return cursorToSpotifyArtistMapper.map(cursor)
-    }
-
-    override fun updateArtist(artistName: String, info: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun insertArtist(artistName: String, info: String) {
-        TODO("Not yet implemented")
+        return cursorToLastFMArtistMapper.map(cursor)
     }
 
     private fun newArtistCursor(artist: String): Cursor {
