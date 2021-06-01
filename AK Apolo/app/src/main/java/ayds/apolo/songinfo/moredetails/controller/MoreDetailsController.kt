@@ -1,7 +1,6 @@
 package ayds.apolo.songinfo.moredetails.controller
 
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
-import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsUiEvent
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
 import ayds.observer.Observer
@@ -25,12 +24,17 @@ internal class MoreDetailsControllerImpl(
         Observer { value ->
             when(value){
                 MoreDetailsUiEvent.ViewFullArticle -> viewFullArticle()
+                MoreDetailsUiEvent.OnCreated -> searchArticle()
             }
         }
 
+    private fun searchArticle() {
+        moreDetailsModel.searchArticle(moreDetailsView.uiState.artistName)
+    }
+
     private fun viewFullArticle(){
         Thread{
-            moreDetailsModel.viewFullArticle(moreDetailsView.uiState.artistName)
+            moreDetailsModel.viewFullArticle(moreDetailsView.uiState.articleURL)
         }.start()
     }
 

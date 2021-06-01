@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import ayds.apolo.songinfo.R
-import ayds.apolo.songinfo.home.view.HomeUiEvent
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Article
@@ -61,6 +60,11 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
         initListeners()
         initObservers()
         initApiBuilder()
+        notifyCreated()
+    }
+
+    private fun notifyCreated() {
+        onActionSubject.notify(MoreDetailsUiEvent.OnCreated)
     }
 
     private fun initModule(){
@@ -88,7 +92,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
 
     override fun openURLActivity() {
         val openUrlAction = Intent(Intent.ACTION_VIEW)
-        openUrlAction.data = Uri.parse(uiState.artistURL)
+        openUrlAction.data = Uri.parse(uiState.articleURL)
         startActivity(openUrlAction)
     }
 
@@ -132,16 +136,16 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     private fun updateArticleUiState(article : Article){
         uiState = uiState.copy(
             artistName = article.artistName,
-            artistURL = article.artistURL,
-            artistInfo = article.artistInfo
+            articleURL = article.artistURL,
+            articleInfo = article.artistInfo
         )
     }
 
     private fun updateNoResultsUiState(){
         uiState = uiState.copy(
             artistName = "",
-            artistURL = "",
-            artistInfo = ""
+            articleURL = "",
+            articleInfo = ""
         )
     }
 
@@ -157,7 +161,7 @@ class MoreDetailsViewActivity : AppCompatActivity() , MoreDetailsView {
     }
 
     private fun loadArtistInfo() {
-        moreDetailsPane.text = uiState.artistInfo
+        moreDetailsPane.text = uiState.articleInfo
     }
 
     companion object {
