@@ -33,11 +33,10 @@ internal class ArticleRepositoryImpl(
                         }
                     }
                 } catch(e: Exception){
-                    //Log.e("Artist Article","ERROR: $e")
+                    Log.e("Artist Article","ERROR: $e")
                 }
             }
         }
-        Log.e("Artist Article", "Article $artistArticle")
         return artistArticle ?: EmptyArticle
     }
 

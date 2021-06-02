@@ -1,6 +1,5 @@
 package ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.info
 
-import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -10,12 +9,12 @@ import java.lang.Exception
 interface LastFMToInfoResolver {
     fun getInfoFromExternalData(serviceData: String?): ArtistArticle?
 }
-const val DATA_ARTIST = "artist"
-const val DATA_CONTENT = "content"
-const val ARTIST_NAME = "name"
-const val DATA_BIO = "bio"
-const val DATA_URL = "url"
 
+private const val DATA_ARTIST = "artist"
+private const val DATA_CONTENT = "content"
+private const val ARTIST_NAME = "name"
+private const val DATA_BIO = "bio"
+private const val DATA_URL = "url"
 
 internal class JsonToInfoResolver : LastFMToInfoResolver{
 
@@ -52,5 +51,4 @@ internal class JsonToInfoResolver : LastFMToInfoResolver{
     private fun JsonObject.getArticleUrl(): String {
         return this[DATA_URL].asString
     }
-
 }

@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
@@ -21,11 +20,9 @@ import ayds.apolo.songinfo.utils.view.ImageLoader
 import ayds.observer.Observable
 import ayds.observer.Subject
 
-private const val IMAGE_URL =
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-private const val LASTFM_URL = "https://ws.audioscrobbler.com/2.0/"
+private const val IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
 private const val ARTIST_NAME = "artistName"
-const val STORE_LETTER = "*"
+private const val STORE_LETTER = "*\n\n"
 
 interface MoreDetailsView{
     val uiEventObservable : Observable<MoreDetailsUiEvent>
@@ -171,8 +168,13 @@ class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
     }
 
     private fun loadArtistInfo() {
+
+        Log.e("loadArtistInfo: ", "Artist info: ${uiState.artistInfo}")
+
         moreDetailsPane.text = Html.fromHtml(helperArticleInfo.
                                             getTextToHtml(uiState.artistInfo,uiState.artistName))
+
+        Log.e("loadArtistInfo: ", "Aritst info Despues: ${helperArticleInfo.getTextToHtml(uiState.artistInfo,uiState.artistName)}")
     }
 
     companion object {

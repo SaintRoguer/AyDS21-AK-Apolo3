@@ -1,6 +1,5 @@
 package ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.info
 
-import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.LastFMInfoService
 import retrofit2.Response

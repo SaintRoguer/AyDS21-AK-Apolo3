@@ -37,17 +37,4 @@ internal class MoreDetailsControllerImpl(
     private fun viewFullArticle(){
             moreDetailsModel.viewFullArticle(moreDetailsView.uiState.articleURL)
     }
-
-
-/*
-    private fun showFullArticle(){
-        val article = getArticleFromModel()
-        moreDetailsView.getArtistInfo(article.artistInfo,article.artistName)
-        moreDetailsView.updateArticle(article)
-    }
-
-    private fun getArticleFromModel() : Article =
-        moreDetailsModel.viewFullArticle(moreDetailsView.uiState.artistName)
-
- */
 }

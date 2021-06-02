@@ -23,7 +23,6 @@ internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
 
     override fun searchArticle(artistName: String){
         repository.getArticleByArtistName(artistName).let{
-            Log.e("LastFM Article", "model notify $it")
             articleSubject.notify(it)
         }
     }

@@ -2,12 +2,10 @@ package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
-import java.util.ArrayList
 
 private const val DATABASE_VERSION = 1
 private const val DATABASE_NAME = "artists.db"
@@ -55,34 +53,8 @@ internal class ArtistLocalStorageImpl(
             arrayOf(artistName),
             null,
             null,
-            null
+            ARTIST_DESC_COLUMN
         )
         return cursorToLastFMArtistMapper.map(cursor)
     }
-
-    private fun newArtistCursor(artist: String): Cursor {
-        val selection = "artist  = ?"
-        val selectionArgs = arrayOf(artist)
-        val sortOrder = ARTIST_DESC_COLUMN
-        return this.readableDatabase.query(
-            ARTISTS_TABLE,
-            projection,
-            selection,
-            selectionArgs,
-            null,
-            null,
-            sortOrder
-        )
-    }
-
-    private fun getArtistItems(cursor: Cursor): MutableList<String> {
-        val items = ArrayList<String>()
-        while (cursor.moveToNext()) {
-            val columnIndex = cursor.getColumnIndexOrThrow(INFO_COLUMN)
-            val info = cursor.getString(columnIndex)
-            items.add(info)
-        }
-        return items
-    }
-
 }
