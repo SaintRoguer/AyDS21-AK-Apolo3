@@ -3,6 +3,7 @@ package ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.info
 import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import java.lang.Exception
 
@@ -19,16 +20,16 @@ const val DATA_URL = "url"
 internal class JsonToInfoResolver : LastFMToInfoResolver{
 
     override fun getInfoFromExternalData(serviceData: String?): ArtistArticle? =
-      try{
-          serviceData?.getJson()?.getArtistInfo()?.let { item->
-              ArtistArticle(
-                  item.getArtistName(), item.getArticleDescription(),
-                  item.getArticleUrl()
-              )
-          }
-      } catch (e: Exception){
-          null
-      }
+        try{
+            serviceData?.getJson()?.getArtistInfo()?.let { item->
+                ArtistArticle(
+                    item.getArtistName(), item.getArticleDescription().asString.replace("\\n", "\n"),
+                    item.getArticleUrl()
+                )
+            }
+        } catch (e: Exception){
+            null
+        }
 
     private fun String?.getJson():JsonObject{
         val gson = Gson()
@@ -43,13 +44,13 @@ internal class JsonToInfoResolver : LastFMToInfoResolver{
         return this[ARTIST_NAME].asString
     }
 
-    private fun JsonObject.getArticleDescription(): String {
+    private fun JsonObject.getArticleDescription(): JsonElement {
         val articleDescription= this[DATA_BIO].asJsonObject
-        Log.e("Mensaje de TAG", "QUIERO VER LO QUE HAY DENTRO: ${articleDescription["content"]}")
-        return articleDescription[DATA_CONTENT].asString
+        return articleDescription[DATA_CONTENT]
     }
 
     private fun JsonObject.getArticleUrl(): String {
         return this[DATA_URL].asString
     }
+
 }

@@ -1,5 +1,6 @@
 package ayds.apolo.songinfo.moredetails.view
 
+import android.util.Log
 import java.util.*
 
 interface ArticleHelper {
@@ -14,13 +15,12 @@ internal class ArticleHelperImpl : ArticleHelper {
 
     override fun getTextToHtml(text: String, term: String) =
         StringBuilder().apply{
-             append(START_HTML)
-             append(FONT_HTML)
-             append(formatText(term, text))
-             append(END_HTML)
+            append(START_HTML)
+            append(FONT_HTML)
+            Log.e("FORMAT TEXT : ", "${formatText(term,text)}")
+            append(formatText(term, text))
+            append(END_HTML)
         }.toString()
-
-
 
     private fun formatText(term: String, text: String): String {
         return text
