@@ -13,7 +13,7 @@ private const val END_HTML = "</font></div></html>"
 internal class ArticleHelperImpl : ArticleHelper {
 
     override fun getTextToHtml(text: String, term: String) =
-        StringBuilder().apply{
+        StringBuilder().apply {
             append(START_HTML)
             append(FONT_HTML)
             append(formatText(term, text))

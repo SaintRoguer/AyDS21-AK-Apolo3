@@ -7,7 +7,7 @@ import retrofit2.Response
 internal class LastFmInfoServiceImpl(
     private val lastFMInfoAPI: LastFMInfoAPI,
     private val lastFMToInfoResolver: LastFMToInfoResolver
-):LastFMInfoService {
+) : LastFMInfoService {
 
     override fun getArtistInfo(artist: String): ArtistArticle? {
         val callResponse = getResponseFromService(artist)

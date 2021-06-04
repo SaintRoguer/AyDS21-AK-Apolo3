@@ -17,8 +17,8 @@ internal class CursorToLastFMSongMapperImpl : CursorToLastFMArtistMapper {
                 if (moveToNext()) {
                     ArtistArticle(
                         artistName = getString(getColumnIndexOrThrow(ARTIST_COLUMN)),
-                        artistInfo = getString(getColumnIndexOrThrow(INFO_COLUMN)),
-                        artistURL = getString(getColumnIndexOrThrow(SOURCE_COLUMN))
+                        articleInfo = getString(getColumnIndexOrThrow(INFO_COLUMN)),
+                        articleURL = getString(getColumnIndexOrThrow(SOURCE_COLUMN))
                     )
                 } else {
                     null

@@ -5,7 +5,7 @@ const val ARTIST_COLUMN = "artist"
 const val ID_COLUMN = "id"
 const val INFO_COLUMN = "info"
 const val SOURCE_COLUMN = "source"
-const val ARTICLE_URL_COLUMN= "article url"
+const val ARTICLE_URL_COLUMN = "article url"
 const val ARTIST_DESC_COLUMN = "artist DESC"
 
 const val createArtistsTableQuery: String =

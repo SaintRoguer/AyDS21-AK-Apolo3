@@ -12,11 +12,11 @@ import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb.Curso
 
 object MoreDetailsModelModule {
 
-    private lateinit var moreDetailsModel : MoreDetailsModel
+    private lateinit var moreDetailsModel: MoreDetailsModel
 
-    fun getMoreDetailsModel() : MoreDetailsModel = moreDetailsModel
+    fun getMoreDetailsModel(): MoreDetailsModel = moreDetailsModel
 
-    fun initMoreDetailsModel(moreDetailsView : MoreDetailsView){
+    fun initMoreDetailsModel(moreDetailsView: MoreDetailsView) {
         val artistLocalStorage: ArtistLocalStorage = ArtistLocalStorageImpl(
             moreDetailsView as Context, CursorToLastFMSongMapperImpl()
         )
@@ -25,7 +25,7 @@ object MoreDetailsModelModule {
         val repository: ArticleRepository =
             ArticleRepositoryImpl(artistLocalStorage, lastFMInfoService)
 
-        moreDetailsModel= MoreDetailsModelImpl(repository)
+        moreDetailsModel = MoreDetailsModelImpl(repository)
     }
 
 }

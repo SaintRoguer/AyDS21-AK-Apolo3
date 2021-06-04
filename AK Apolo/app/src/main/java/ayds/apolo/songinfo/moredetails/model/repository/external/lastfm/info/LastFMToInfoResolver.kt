@@ -16,21 +16,22 @@ private const val ARTIST_NAME = "name"
 private const val DATA_BIO = "bio"
 private const val DATA_URL = "url"
 
-internal class JsonToInfoResolver : LastFMToInfoResolver{
+internal class JsonToInfoResolver : LastFMToInfoResolver {
 
     override fun getInfoFromExternalData(serviceData: String?): ArtistArticle? =
-        try{
-            serviceData?.getJson()?.getArtistInfo()?.let { item->
+        try {
+            serviceData?.getJson()?.getArtistInfo()?.let { item ->
                 ArtistArticle(
-                    item.getArtistName(), item.getArticleDescription().asString.replace("\\n", "\n"),
+                    item.getArtistName(),
+                    item.getArticleDescription().asString.replace("\\n", "\n"),
                     item.getArticleUrl()
                 )
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             null
         }
 
-    private fun String?.getJson():JsonObject{
+    private fun String?.getJson(): JsonObject {
         val gson = Gson()
         return gson.fromJson(this, JsonObject::class.java)
     }
@@ -44,7 +45,7 @@ internal class JsonToInfoResolver : LastFMToInfoResolver{
     }
 
     private fun JsonObject.getArticleDescription(): JsonElement {
-        val articleDescription= this[DATA_BIO].asJsonObject
+        val articleDescription = this[DATA_BIO].asJsonObject
         return articleDescription[DATA_CONTENT]
     }
 

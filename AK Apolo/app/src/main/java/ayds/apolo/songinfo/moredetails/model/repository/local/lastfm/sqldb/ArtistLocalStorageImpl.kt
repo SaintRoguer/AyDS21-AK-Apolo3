@@ -35,18 +35,18 @@ internal class ArtistLocalStorageImpl(
 
     override fun saveArticle(artist: String, info: String) {
         val artistInfoArray = arrayOf(artist, info)
-        val column=fillDatabaseWithNewRow(artistInfoArray)
+        val column = fillDatabaseWithNewRow(artistInfoArray)
         this.writableDatabase.insert(ARTISTS_TABLE, null, column)
     }
 
-    private fun fillDatabaseWithNewRow(artistInfo: Array<String>) = ContentValues().apply{
+    private fun fillDatabaseWithNewRow(artistInfo: Array<String>) = ContentValues().apply {
         put(ARTIST_COLUMN, artistInfo[0])
         put(INFO_COLUMN, artistInfo[1])
         put(SOURCE_COLUMN, 1)
     }
 
     override fun getArticleByArtistName(artistName: String): ArtistArticle? {
-        val cursor= readableDatabase.query(
+        val cursor = readableDatabase.query(
             ARTISTS_TABLE,
             projection,
             "$ARTIST_COLUMN = ?",

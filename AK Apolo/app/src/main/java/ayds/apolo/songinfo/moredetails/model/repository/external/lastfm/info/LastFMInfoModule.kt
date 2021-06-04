@@ -13,9 +13,9 @@ object LastFMInfoModule {
         .build()
 
     private val lastFMInfoAPI = lastFMAPIRetrofit.create(LastFMInfoAPI::class.java)
-    private val lastFMToInfoResolver : LastFMToInfoResolver = JsonToInfoResolver()
+    private val lastFMToInfoResolver: LastFMToInfoResolver = JsonToInfoResolver()
 
-    val lastFMInfoService : LastFMInfoService = LastFmInfoServiceImpl(
+    val lastFMInfoService: LastFMInfoService = LastFmInfoServiceImpl(
         lastFMInfoAPI,
         lastFMToInfoResolver
     )

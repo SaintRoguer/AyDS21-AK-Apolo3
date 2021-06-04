@@ -20,28 +20,29 @@ import ayds.apolo.songinfo.utils.view.ImageLoader
 import ayds.observer.Observable
 import ayds.observer.Subject
 
-private const val IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
+private const val IMAGE_URL =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
 private const val ARTIST_NAME = "artistName"
 private const val STORE_LETTER = "*\n\n"
 
-interface MoreDetailsView{
-    val uiEventObservable : Observable<MoreDetailsUiEvent>
-    val uiState : MoreDetailsUiState
+interface MoreDetailsView {
+    val uiEventObservable: Observable<MoreDetailsUiEvent>
+    val uiState: MoreDetailsUiState
 
-    fun updateArticle(article : Article)
+    fun updateArticle(article: Article)
     fun openURLActivity()
     fun updateUrl(url: String)
 }
 
-class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
+class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
-    private lateinit var moreDetailsModel : MoreDetailsModel
+    private lateinit var moreDetailsModel: MoreDetailsModel
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiState: MoreDetailsUiState = MoreDetailsUiState()
 
-    private val imageLoader : ImageLoader = UtilsModule.imageLoader
+    private val imageLoader: ImageLoader = UtilsModule.imageLoader
 
 
     private val helperArticleInfo: ArticleHelper = MoreDetailsViewModule.helperArticleInfo
@@ -54,7 +55,7 @@ class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
         uiState = uiState.copy(articleURL = url)
     }
 
-    override fun onCreate(savedInstanceState : Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_info)
 
@@ -70,12 +71,12 @@ class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
         onActionSubject.notify(MoreDetailsUiEvent.OnCreated)
     }
 
-    private fun initModule(){
+    private fun initModule() {
         MoreDetailsViewModule.init(this)
         moreDetailsModel = MoreDetailsModelModule.getMoreDetailsModel()
     }
 
-    private fun initProperties(){
+    private fun initProperties() {
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
         moreDetailsButton = findViewById(R.id.openUrlButton)
         imageView = findViewById(R.id.imageView)
@@ -102,10 +103,10 @@ class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
         startActivity(openUrlAction)
     }
 
-    private fun initObservers(){
+    private fun initObservers() {
         moreDetailsModel.articleObservable()
-            .subscribe{
-                value -> updateArticle(value)
+            .subscribe { value ->
+                updateArticle(value)
             }
     }
 
@@ -113,42 +114,42 @@ class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullArticle)
     }
 
-    override fun updateArticle(article : Article){
+    override fun updateArticle(article: Article) {
         updateUiState(article)
         updateArtistInfoUI()
     }
 
-    private fun updateUiState(article : Article){
-        when (article){
+    private fun updateUiState(article: Article) {
+        when (article) {
             is ArtistArticle -> updateArticleUiState(article)
             EmptyArticle -> updateNoResultsUiState()
         }
     }
 
-    private fun updateArticleUiState(article : Article){
-        when(article.isLocallyStoraged){
+    private fun updateArticleUiState(article: Article) {
+        when (article.isLocallyStoraged) {
             true -> addStorePrefix(article)
             else -> withoutPrefix(article)
         }
     }
 
-    private fun addStorePrefix(article : Article){
+    private fun addStorePrefix(article: Article) {
         uiState = uiState.copy(
             artistName = article.artistName,
-            articleURL = article.artistURL,
-            artistInfo = STORE_LETTER.plus(article.artistInfo)
+            articleURL = article.articleURL,
+            artistInfo = STORE_LETTER.plus(article.articleInfo)
         )
     }
 
-    private fun withoutPrefix(article : Article) {
+    private fun withoutPrefix(article: Article) {
         uiState = uiState.copy(
             artistName = article.artistName,
-            articleURL = article.artistURL,
-            artistInfo = article.artistInfo,
+            articleURL = article.articleURL,
+            artistInfo = article.articleInfo,
         )
     }
 
-    private fun updateNoResultsUiState(){
+    private fun updateNoResultsUiState() {
         uiState = uiState.copy(
             artistName = "",
             articleURL = "",
@@ -171,14 +172,22 @@ class MoreDetailsViewActivity() : AppCompatActivity() , MoreDetailsView {
 
         Log.e("loadArtistInfo: ", "Artist info: ${uiState.artistInfo}")
 
-        moreDetailsPane.text = Html.fromHtml(helperArticleInfo.
-                                            getTextToHtml(uiState.artistInfo,uiState.artistName))
+        moreDetailsPane.text = Html.fromHtml(
+            helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
+        )
 
-        Log.e("loadArtistInfo: ", "Aritst info Despues: ${helperArticleInfo.getTextToHtml(uiState.artistInfo,uiState.artistName)}")
+        Log.e(
+            "loadArtistInfo: ",
+            "Aritst info Despues: ${
+                helperArticleInfo.getTextToHtml(
+                    uiState.artistInfo,
+                    uiState.artistName
+                )
+            }"
+        )
     }
 
     companion object {
         const val ARTIST_NAME_EXTRA = ARTIST_NAME
     }
-
 }

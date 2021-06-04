@@ -8,5 +8,5 @@ internal interface LastFMInfoAPI {
     @GET("?method=artist.getinfo&api_key=0a657854db69e551c97d541ca9ebcef4&format=json")
     fun getArtistInfo(
         @Query("artist") artist: String
-    ):  Call<String>
+    ): Call<String>
 }
