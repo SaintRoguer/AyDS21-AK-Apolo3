@@ -4,7 +4,7 @@ import ayds.apolo.songinfo.moredetails.controller.MoreDetailsControllerModule
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 
 object MoreDetailsViewModule {
-    val helperArticleInfo: ArticleHelper = ArticleHelperImpl()
+    val HELPER_ARTICLE_INFO: ArticleFormatter = ArticleFormatterImpl()
 
     fun init(moreDetailsView: MoreDetailsView) {
         MoreDetailsModelModule.initMoreDetailsModel(moreDetailsView)

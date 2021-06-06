@@ -35,6 +35,7 @@ internal class MoreDetailsControllerImpl(
     }
 
     private fun viewFullArticle() {
-        moreDetailsModel.viewFullArticle(moreDetailsView.uiState.articleURL)
+        moreDetailsView.viewFullArticle()
+        moreDetailsView.openURLActivity()
     }
 }

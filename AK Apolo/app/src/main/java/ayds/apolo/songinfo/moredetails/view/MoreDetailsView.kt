@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,7 +15,6 @@ import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
 import ayds.apolo.songinfo.utils.UtilsModule
-import ayds.apolo.songinfo.utils.view.ImageLoader
 import ayds.observer.Observable
 import ayds.observer.Subject
 
@@ -32,6 +30,7 @@ interface MoreDetailsView {
     fun updateArticle(article: Article)
     fun openURLActivity()
     fun updateUrl(url: String)
+    fun viewFullArticle(): Article
 }
 
 class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
@@ -42,14 +41,9 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiState: MoreDetailsUiState = MoreDetailsUiState()
 
-    private val imageLoader: ImageLoader = UtilsModule.imageLoader
-
-
-    private val helperArticleInfo: ArticleHelper = MoreDetailsViewModule.helperArticleInfo
     private lateinit var moreDetailsPane: TextView
     private lateinit var moreDetailsButton: Button
     private lateinit var imageView: ImageView
-
 
     override fun updateUrl(url: String) {
         uiState = uiState.copy(articleURL = url)
@@ -93,7 +87,6 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
     private fun initURLButtonListener() {
         moreDetailsButton.setOnClickListener {
             notifyFullArticleAction()
-            openURLActivity()
         }
     }
 
@@ -128,12 +121,12 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
 
     private fun updateArticleUiState(article: Article) {
         when (article.isLocallyStoraged) {
-            true -> addStorePrefix(article)
-            else -> withoutPrefix(article)
+            true -> updateStoredArticleUiState(article)
+            else -> updateNewArticleUiState(article)
         }
     }
 
-    private fun addStorePrefix(article: Article) {
+    private fun updateStoredArticleUiState(article: Article) {
         uiState = uiState.copy(
             artistName = article.artistName,
             articleURL = article.articleURL,
@@ -141,7 +134,7 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
         )
     }
 
-    private fun withoutPrefix(article: Article) {
+    private fun updateNewArticleUiState(article: Article) {
         uiState = uiState.copy(
             artistName = article.artistName,
             articleURL = article.articleURL,
@@ -165,27 +158,18 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun loadLastFMImage() {
-        imageLoader.loadImageIntoView(IMAGE_URL, imageView)
+        UtilsModule.imageLoader.loadImageIntoView(IMAGE_URL, imageView)
     }
 
     private fun loadArtistInfo() {
-
-        Log.e("loadArtistInfo: ", "Artist info: ${uiState.artistInfo}")
-
         moreDetailsPane.text = Html.fromHtml(
-            helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
-        )
-
-        Log.e(
-            "loadArtistInfo: ",
-            "Aritst info Despues: ${
-                helperArticleInfo.getTextToHtml(
-                    uiState.artistInfo,
-                    uiState.artistName
-                )
-            }"
+            MoreDetailsViewModule.HELPER_ARTICLE_INFO.getTextToHtml(uiState.artistInfo, uiState.artistName)
         )
     }
+
+    override fun viewFullArticle(): Article =
+        moreDetailsModel.getRepository().getArticleByArtistName(uiState.artistName)
+
 
     companion object {
         const val ARTIST_NAME_EXTRA = ARTIST_NAME

@@ -1,6 +1,5 @@
 package ayds.apolo.songinfo.utils.view
 
-import android.util.Log
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
 
