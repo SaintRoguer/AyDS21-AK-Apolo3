@@ -25,12 +25,8 @@ internal class ArticleRepositoryImpl(
             else -> {
                 try {
                     artistArticle = lastFMInfoService.getArtistInfo(artistName)
-
                     artistArticle?.let {
-                        when {
-                            !it.isSavedArticle()
-                            -> artistLocalStorage.saveArticle(artistName, it.articleInfo)
-                        }
+                        artistLocalStorage.saveArticle(artistName, it.articleInfo)
                     }
                 } catch (e: Exception) {
                     Log.e("Artist Article", "ERROR: $e")
@@ -40,9 +36,6 @@ internal class ArticleRepositoryImpl(
         return artistArticle ?: EmptyArticle
     }
 
-    private fun ArtistArticle.isSavedArticle() =
-        artistLocalStorage.getArticleByArtistName(artistName) != null
-
     private fun markArticleAsLocal(artistArticle: ArtistArticle) {
         artistArticle.isLocallyStoraged = true
         addStorePrefix(artistArticle)
@@ -50,5 +43,4 @@ internal class ArticleRepositoryImpl(
 
     private fun addStorePrefix(artistArticle: ArtistArticle): String =
         STORE_LETTER.plus(artistArticle)
-
 }

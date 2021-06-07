@@ -28,12 +28,11 @@ interface MoreDetailsView {
     val uiState: MoreDetailsUiState
 
     fun updateArticle(article: Article)
-    fun openURLActivity()
+    fun openArticleURLActivity()
     fun updateUrl(url: String)
-    fun viewFullArticle(): Article
 }
 
-class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
+class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
     private lateinit var moreDetailsModel: MoreDetailsModel
@@ -90,7 +89,7 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
         }
     }
 
-    override fun openURLActivity() {
+    override fun openArticleURLActivity() {
         val openUrlAction = Intent(Intent.ACTION_VIEW)
         openUrlAction.data = Uri.parse(uiState.articleURL)
         startActivity(openUrlAction)
@@ -128,7 +127,6 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
 
     private fun updateStoredArticleUiState(article: Article) {
         uiState = uiState.copy(
-            artistName = article.artistName,
             articleURL = article.articleURL,
             artistInfo = STORE_LETTER.plus(article.articleInfo)
         )
@@ -136,7 +134,6 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
 
     private fun updateNewArticleUiState(article: Article) {
         uiState = uiState.copy(
-            artistName = article.artistName,
             articleURL = article.articleURL,
             artistInfo = article.articleInfo,
         )
@@ -144,7 +141,6 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
 
     private fun updateNoResultsUiState() {
         uiState = uiState.copy(
-            artistName = "",
             articleURL = "",
             artistInfo = ""
         )
@@ -166,10 +162,6 @@ class MoreDetailsViewActivity() : AppCompatActivity(), MoreDetailsView {
             MoreDetailsViewModule.HELPER_ARTICLE_INFO.getTextToHtml(uiState.artistInfo, uiState.artistName)
         )
     }
-
-    override fun viewFullArticle(): Article =
-        moreDetailsModel.getRepository().getArticleByArtistName(uiState.artistName)
-
 
     companion object {
         const val ARTIST_NAME_EXTRA = ARTIST_NAME

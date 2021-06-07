@@ -22,7 +22,6 @@ internal class JsonToInfoResolver : LastFMToInfoResolver {
         try {
             serviceData?.getJson()?.getArtistInfo()?.let { item ->
                 ArtistArticle(
-                    item.getArtistName(),
                     item.getArticleDescription().asString.replace("\\n", "\n"),
                     item.getArticleUrl()
                 )
@@ -38,10 +37,6 @@ internal class JsonToInfoResolver : LastFMToInfoResolver {
 
     private fun JsonObject.getArtistInfo(): JsonObject {
         return this[DATA_ARTIST].asJsonObject
-    }
-
-    private fun JsonObject.getArtistName(): String {
-        return this[ARTIST_NAME].asString
     }
 
     private fun JsonObject.getArticleDescription(): JsonElement {

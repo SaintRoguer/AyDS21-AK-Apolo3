@@ -10,8 +10,6 @@ interface MoreDetailsModel {
     fun searchArticle(artistName: String)
 
     fun articleObservable(): Observable<Article>
-
-    fun getRepository(): ArticleRepository
 }
 
 internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
@@ -26,7 +24,4 @@ internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
     }
 
     override fun articleObservable(): Observable<Article> = articleSubject
-
-    override fun getRepository(): ArticleRepository = repository
-
 }
