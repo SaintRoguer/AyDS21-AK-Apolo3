@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
 
@@ -19,8 +20,8 @@ internal class ArtistLocalStorageImpl(
     private val projection = arrayOf(
         ARTIST_COLUMN,
         ID_COLUMN,
-        SOURCE_COLUMN,
-        INFO_COLUMN
+        INFO_COLUMN,
+        ARTICLE_URL_COLUMN
     )
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -33,15 +34,17 @@ internal class ArtistLocalStorageImpl(
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    override fun saveArticle(artist: String, info: String) {
-        val column = fillDatabaseWithNewRow(artist, info)
+    override fun saveArticle(artistName : String, article : Article) {
+        val column = fillDatabaseWithNewRow(artistName, article.articleInfo, article.articleURL)
         this.writableDatabase.insert(ARTISTS_TABLE, null, column)
     }
 
-    private fun fillDatabaseWithNewRow(artistName : String, artistInfo: String) = ContentValues().apply {
-        put(ARTIST_COLUMN, artistName)
-        put(INFO_COLUMN, artistInfo)
-        put(SOURCE_COLUMN, 1)
+    private fun fillDatabaseWithNewRow(artistName : String, articleInfo: String, articleURL : String) =
+        ContentValues().apply {
+            put(ARTIST_COLUMN, artistName)
+            put(INFO_COLUMN, articleInfo)
+            put(ARTICLE_URL_COLUMN, articleURL)
+            put(SOURCE_COLUMN, 1)
     }
 
     override fun getArticleByArtistName(artistName: String): ArtistArticle? {

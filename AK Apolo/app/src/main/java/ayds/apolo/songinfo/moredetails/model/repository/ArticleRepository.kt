@@ -26,7 +26,7 @@ internal class ArticleRepositoryImpl(
                 try {
                     artistArticle = lastFMInfoService.getArtistInfo(artistName)
                     artistArticle?.let {
-                        artistLocalStorage.saveArticle(artistName, it.articleInfo)
+                        artistLocalStorage.saveArticle(artistName, it)
                     }
                 } catch (e: Exception) {
                     Log.e("Artist Article", "ERROR: $e")
