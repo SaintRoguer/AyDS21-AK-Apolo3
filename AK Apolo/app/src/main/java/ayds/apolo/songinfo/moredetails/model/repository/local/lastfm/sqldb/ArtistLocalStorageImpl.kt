@@ -18,10 +18,11 @@ internal class ArtistLocalStorageImpl(
     ArtistLocalStorage {
 
     private val projection = arrayOf(
-        ARTIST_COLUMN,
         ID_COLUMN,
+        ARTIST_COLUMN,
         INFO_COLUMN,
-        ARTICLE_URL_COLUMN
+        ARTICLE_URL_COLUMN,
+        SOURCE_COLUMN
     )
 
     override fun onCreate(db: SQLiteDatabase) {

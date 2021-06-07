@@ -10,8 +10,8 @@ const val ARTIST_DESC_COLUMN = "artist DESC"
 
 const val createArtistsTableQuery: String =
     "create table $ARTISTS_TABLE (" +
-            "$ARTIST_COLUMN string, " +
             "$ID_COLUMN INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "$ARTIST_COLUMN string, " +
             "$INFO_COLUMN string, " +
-            "$ARTICLE_URL_COLUMN string"+
+            "$ARTICLE_URL_COLUMN string, "+
             "$SOURCE_COLUMN integer)"
