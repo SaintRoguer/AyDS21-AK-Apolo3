@@ -21,7 +21,7 @@ internal class ArticleRepositoryImpl(
     override fun getArticleByArtistName(artistName: String): Article {
         var artistArticle = artistLocalStorage.getArticleByArtistName(artistName)
         when {
-            artistArticle != null -> markArticleAsLocal(artistArticle)
+            artistArticle != null -> artistArticle.isLocallyStoraged = true
             else -> {
                 try {
                     artistArticle = lastFMInfoService.getArtistInfo(artistName)
@@ -35,12 +35,4 @@ internal class ArticleRepositoryImpl(
         }
         return artistArticle ?: EmptyArticle
     }
-
-    private fun markArticleAsLocal(artistArticle: ArtistArticle) {
-        artistArticle.isLocallyStoraged = true
-        addStorePrefix(artistArticle)
-    }
-
-    private fun addStorePrefix(artistArticle: ArtistArticle): String =
-        STORE_LETTER.plus(artistArticle)
 }

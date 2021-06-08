@@ -1,8 +1,6 @@
 package ayds.apolo.songinfo.moredetails.view
 
 import androidx.appcompat.app.AppCompatActivity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.widget.Button
@@ -14,12 +12,12 @@ import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
+import ayds.apolo.songinfo.moredetails.view.MoreDetailsUiState.Companion.IMAGE_URL
+import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.observer.Observable
 import ayds.observer.Subject
 
-private const val IMAGE_URL =
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
 private const val ARTIST_NAME = "artistName"
 private const val STORE_LETTER = "*\n\n"
 
@@ -90,9 +88,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     override fun openArticleURLActivity() {
-        val openUrlAction = Intent(Intent.ACTION_VIEW)
-        openUrlAction.data = Uri.parse(uiState.articleURL)
-        startActivity(openUrlAction)
+        openExternalUrl(uiState.articleURL)
     }
 
     private fun initObservers() {
@@ -159,7 +155,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun loadArtistInfo() {
         moreDetailsPane.text = Html.fromHtml(
-            MoreDetailsViewModule.HELPER_ARTICLE_INFO.getTextToHtml(uiState.artistInfo, uiState.artistName)
+            MoreDetailsViewModule.helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
         )
     }
 
