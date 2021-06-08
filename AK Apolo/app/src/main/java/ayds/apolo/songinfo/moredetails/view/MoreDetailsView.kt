@@ -138,7 +138,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateNoResultsUiState() {
         uiState = uiState.copy(
-            articleURL = "Artículo no encontrado!",
+            articleURL = "",
             artistInfo = "Información no encontrada!"
         )
     }
