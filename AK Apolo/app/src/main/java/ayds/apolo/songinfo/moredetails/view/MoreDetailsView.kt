@@ -34,6 +34,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
     private lateinit var moreDetailsModel: MoreDetailsModel
+    private val helperArticleInfo = MoreDetailsViewModule.helperArticleInfo
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiState: MoreDetailsUiState = MoreDetailsUiState()
@@ -137,8 +138,8 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateNoResultsUiState() {
         uiState = uiState.copy(
-            articleURL = "",
-            artistInfo = ""
+            articleURL = "Artículo no encontrado!",
+            artistInfo = "Información no encontrada!"
         )
     }
 
@@ -155,7 +156,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun loadArtistInfo() {
         moreDetailsPane.text = Html.fromHtml(
-            MoreDetailsViewModule.helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
+            helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
         )
     }
 
