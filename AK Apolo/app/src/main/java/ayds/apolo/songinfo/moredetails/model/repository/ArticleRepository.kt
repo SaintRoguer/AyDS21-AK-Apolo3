@@ -4,7 +4,8 @@ import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.Article
 import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
-import ayds.apolo.songinfo.moredetails.model.repository.external.lastfm.LastFMInfoService
+import ayds.apolo3.lastfm.LastFMInfoService
+import ayds.apolo3.lastfm.ArtistArticle as ServiceLastFMData
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
 
 
@@ -14,7 +15,7 @@ interface ArticleRepository {
 
 internal class ArticleRepositoryImpl(
     private val artistLocalStorage: ArtistLocalStorage,
-    private val lastFMInfoService: LastFMInfoService,
+    private val lastFMInfoService:  LastFMInfoService,
 ) : ArticleRepository {
 
     override fun getArticleByArtistName(artistName: String): Article {
@@ -23,7 +24,16 @@ internal class ArticleRepositoryImpl(
             artistArticle != null -> articleInLocalStorage(artistArticle)
             else -> {
                 try {
-                    artistArticle = lastFMInfoService.getArtistInfo(artistName)
+                    val serviceLastFMData = lastFMInfoService.getArtistInfo(artistName)
+
+                    serviceLastFMData?.let{
+                        artistArticle = ArtistArticle(
+                            it.articleInfo,
+                            it.articleURL,
+                            it.isLocallyStoraged
+                        )
+                    }
+
                     artistArticle?.let {
                         artistLocalStorage.saveArticle(artistName, it)
                     }
