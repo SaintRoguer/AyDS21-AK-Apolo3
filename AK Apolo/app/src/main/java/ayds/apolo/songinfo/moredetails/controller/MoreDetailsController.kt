@@ -35,6 +35,6 @@ internal class MoreDetailsControllerImpl(
     }
 
     private fun viewFullArticle() {
-        moreDetailsView.openArticleURLActivity()
+        moreDetailsView.openCardURLActivity()
     }
 }

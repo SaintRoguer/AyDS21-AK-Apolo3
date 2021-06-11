@@ -1,6 +1,6 @@
 package ayds.apolo.songinfo.moredetails.model
 
-import ayds.apolo.songinfo.moredetails.model.entities.Article
+import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.repository.ArticleRepository
 import ayds.observer.Observable
 import ayds.observer.Subject
@@ -9,19 +9,19 @@ interface MoreDetailsModel {
 
     fun searchArticle(artistName: String)
 
-    fun articleObservable(): Observable<Article>
+    fun articleObservable(): Observable<Card>
 }
 
 internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
     MoreDetailsModel {
 
-    private val articleSubject = Subject<Article>()
+    private val cardSubject = Subject<Card>()
 
     override fun searchArticle(artistName: String) {
         repository.getArticleByArtistName(artistName).let {
-            articleSubject.notify(it)
+            cardSubject.notify(it)
         }
     }
 
-    override fun articleObservable(): Observable<Article> = articleSubject
+    override fun articleObservable(): Observable<Card> = cardSubject
 }

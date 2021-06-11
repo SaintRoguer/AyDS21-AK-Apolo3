@@ -9,9 +9,8 @@ import android.widget.TextView
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
-import ayds.apolo.songinfo.moredetails.model.entities.Article
-import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
-import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
+import ayds.apolo.songinfo.moredetails.model.entities.Card
+import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsUiState.Companion.IMAGE_URL
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
@@ -25,8 +24,8 @@ interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
     val uiState: MoreDetailsUiState
 
-    fun updateArticle(article: Article)
-    fun openArticleURLActivity()
+    fun updateCard(card: Card)
+    fun openCardURLActivity()
     fun updateUrl(url: String)
 }
 
@@ -88,14 +87,14 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         }
     }
 
-    override fun openArticleURLActivity() {
+    override fun openCardURLActivity() {
         openExternalUrl(uiState.articleURL)
     }
 
     private fun initObservers() {
         moreDetailsModel.articleObservable()
             .subscribe { value ->
-                updateArticle(value)
+                updateCard(value)
             }
     }
 
@@ -103,36 +102,37 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullArticle)
     }
 
-    override fun updateArticle(article: Article) {
-        updateUiState(article)
+    override fun updateCard(card: Card) {
+        updateUiState(card)
         updateArtistInfoUI()
     }
 
-    private fun updateUiState(article: Article) {
-        when (article) {
-            is ArtistArticle -> updateArticleUiState(article)
-            EmptyArticle -> updateNoResultsUiState()
+    private fun updateUiState(card: Card) {
+        when (card) {
+            is EmptyCard -> updateNoResultsUiState()
+            else -> updateArticleUiState(card)
+
         }
     }
 
-    private fun updateArticleUiState(article: Article) {
+    private fun updateArticleUiState(card: Card) {
         when (article.isLocallyStoraged) {
             true -> updateStoredArticleUiState(article)
             else -> updateNewArticleUiState(article)
         }
     }
 
-    private fun updateStoredArticleUiState(article: Article) {
+    private fun updateStoredArticleUiState(card: Card) {
         uiState = uiState.copy(
-            articleURL = article.articleURL,
-            artistInfo = STORE_LETTER.plus(article.articleInfo)
+            articleURL = card.infoURL,
+            artistInfo = STORE_LETTER.plus(card.description)
         )
     }
 
-    private fun updateNewArticleUiState(article: Article) {
+    private fun updateNewArticleUiState(card: Card) {
         uiState = uiState.copy(
-            articleURL = article.articleURL,
-            artistInfo = article.articleInfo,
+            articleURL = card.infoURL,
+            artistInfo = card.description,
         )
     }
 
