@@ -3,7 +3,8 @@ package ayds.apolo.songinfo.moredetails.view
 data class MoreDetailsUiState(
     val artistName: String = "",
     val articleURL: String = "",
-    val artistInfo: String = ""
+    val artistInfo: String = "",
+    val sourceLabel: String = ""
 ){
 
     companion object {

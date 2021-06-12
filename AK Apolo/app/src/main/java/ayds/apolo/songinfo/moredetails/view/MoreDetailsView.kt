@@ -111,14 +111,14 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         when (card) {
             is EmptyCard -> updateNoResultsUiState()
             else -> updateArticleUiState(card)
-
         }
     }
 
     private fun updateArticleUiState(card: Card) {
-        when (article.isLocallyStoraged) {
-            true -> updateStoredArticleUiState(article)
-            else -> updateNewArticleUiState(article)
+        when (moreDetailsModel.searchArticle(ARTIST_NAME)) {
+            null -> updateNewArticleUiState(card)
+            else -> updateStoredArticleUiState(card)
+
         }
     }
 

@@ -1,10 +1,24 @@
 package ayds.apolo.songinfo.moredetails.model.entities
 
-open class Card (
-    var description : String = "",
-    var infoURL : String = "",
-    var source : Source = Source.NO,
-    var sourceLogoURL : String = ""
- )
+interface Card {
+    var description: String
+    var infoURL: String
+    var source: Source
+    var sourceLogoURL: String
+}
 
-object EmptyCard : Card()
+open class FullCard(
+    override var description: String = "",
+    override var infoURL: String = "",
+    override var source: Source = Source.NO,
+    override var sourceLogoURL: String = ""
+) : Card
+
+open class EmptyCard(
+    override var description: String = "",
+    override var infoURL: String = "",
+    override var source: Source = Source.NO,
+    override var sourceLogoURL: String = ""
+) : Card
+
+

@@ -1,16 +1,14 @@
 package ayds.apolo.songinfo.moredetails.model.repository
 
 import android.util.Log
-import ayds.apolo.songinfo.moredetails.model.entities.Article
-import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
-import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
+import ayds.apolo.songinfo.moredetails.model.entities.*
 import ayds.apolo3.lastfm.LastFMInfoService
 import ayds.apolo3.lastfm.ArtistArticle as ServiceLastFMData
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
 
 
 interface ArticleRepository {
-    fun getArticleByArtistName(artistName: String): Article
+    fun getArticleByArtistName(artistName: String): Card
 }
 
 internal class ArticleRepositoryImpl(
@@ -18,16 +16,16 @@ internal class ArticleRepositoryImpl(
     private val lastFMInfoService:  LastFMInfoService,
 ) : ArticleRepository {
 
-    override fun getArticleByArtistName(artistName: String): Article {
-        var artistArticle = artistLocalStorage.getArticleByArtistName(artistName)
+    override fun getArticleByArtistName(artistName: String): Card {
+        var cardArticle = artistLocalStorage.getArticleByArtistName(artistName)
         when {
-            artistArticle != null -> articleInLocalStorage(artistArticle)
+            cardArticle != null -> articleInLocalStorage(cardArticle)
             else -> {
                 try {
                     val serviceLastFMData = lastFMInfoService.getArtistInfo(artistName)
 
                     serviceLastFMData?.let{
-                        artistArticle = ArtistArticle(
+                        cardArticle = FullCard(
                             it.articleInfo,
                             it.articleURL,
                             it.isLocallyStoraged
@@ -42,7 +40,7 @@ internal class ArticleRepositoryImpl(
                 }
             }
         }
-        return artistArticle ?: EmptyArticle
+        return cardArticle ?: EmptyCard
     }
 
     private fun articleInLocalStorage(artistArticle: ArtistArticle) {
