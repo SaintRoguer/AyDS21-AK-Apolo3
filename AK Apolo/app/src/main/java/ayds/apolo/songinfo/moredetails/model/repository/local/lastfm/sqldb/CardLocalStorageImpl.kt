@@ -4,24 +4,24 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import ayds.apolo.songinfo.moredetails.model.entities.Article
-import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
-import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.ArtistLocalStorage
+import ayds.apolo.songinfo.moredetails.model.entities.Card
+import ayds.apolo.songinfo.moredetails.model.entities.FullCard
+import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.CardLocalStorage
 
 private const val DATABASE_VERSION = 1
 private const val DATABASE_NAME = "artists.db"
 
-internal class ArtistLocalStorageImpl(
+internal class CardLocalStorageImpl(
     context: Context,
     private val cursorToLastFMArtistMapper: CursorToLastFMArtistMapper,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION),
-    ArtistLocalStorage {
+    CardLocalStorage {
 
     private val projection = arrayOf(
         ID_COLUMN,
         ARTIST_COLUMN,
         INFO_COLUMN,
-        ARTICLE_URL_COLUMN,
+        CARD_URL_COLUMN,
         SOURCE_COLUMN
     )
 
@@ -35,20 +35,21 @@ internal class ArtistLocalStorageImpl(
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    override fun saveArticle(artistName : String, article : Article) {
-        val column = fillDatabaseWithNewRow(artistName, article.articleInfo, article.articleURL)
+    override fun saveCard(artistName : String, card : Card) {
+        val column = fillDatabaseWithNewRow(artistName, card.description, card.infoURL, card.source, card.sourceLogoURL)
         this.writableDatabase.insert(ARTISTS_TABLE, null, column)
     }
 
-    private fun fillDatabaseWithNewRow(artistName : String, articleInfo: String, articleURL : String) =
+    private fun fillDatabaseWithNewRow(artistName : String, description: String, infoURL : String, source : Int, sourceLogoURL : String) =
         ContentValues().apply {
             put(ARTIST_COLUMN, artistName)
-            put(INFO_COLUMN, articleInfo)
-            put(ARTICLE_URL_COLUMN, articleURL)
+            put(INFO_COLUMN, description)
+            put(CARD_URL_COLUMN, infoURL)
             put(SOURCE_COLUMN, 1)
+            put(SOURCE_LOGO_COLUMN, sourceLogoURL)
     }
 
-    override fun getArticleByArtistName(artistName: String): ArtistArticle? {
+    override fun getCard(artistName: String): FullCard? {
         val cursor = readableDatabase.query(
             ARTISTS_TABLE,
             projection,

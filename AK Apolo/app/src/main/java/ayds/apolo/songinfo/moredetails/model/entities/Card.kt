@@ -3,22 +3,25 @@ package ayds.apolo.songinfo.moredetails.model.entities
 interface Card {
     var description: String
     var infoURL: String
-    var source: Source
+    var source: Int
     var sourceLogoURL: String
+    var isLocallyStoraged: Boolean
 }
 
-open class FullCard(
+data class FullCard(
     override var description: String = "",
     override var infoURL: String = "",
-    override var source: Source = Source.NO,
-    override var sourceLogoURL: String = ""
+    override var source: Int,
+    override var sourceLogoURL: String = "",
+    override var isLocallyStoraged: Boolean= false
 ) : Card
 
-open class EmptyCard(
-    override var description: String = "",
-    override var infoURL: String = "",
-    override var source: Source = Source.NO,
+object EmptyCard: Card {
+    override var description: String = ""
+    override var infoURL: String = ""
+    override var source: Int = 0
     override var sourceLogoURL: String = ""
-) : Card
+    override var isLocallyStoraged: Boolean= false
+}
 
 

@@ -19,7 +19,7 @@ internal class MoreDetailsModelImpl(private val repository: ArticleRepository) :
 
     override fun searchArticle(artistName: String) {
         repository.getArticleByArtistName(artistName).let {
-            cardSubject.notify()
+            cardSubject.notify(it)
         }
     }
 
