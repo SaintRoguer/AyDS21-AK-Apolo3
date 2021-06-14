@@ -29,8 +29,7 @@ internal class ArticleRepositoryImpl(
                             it.description,
                             it.infoURL,
                             Source.LAST_FM,
-                            it.sourceLogoURL,
-                            true
+                            it.sourceLogoURL
                         )
                     }
                     cardArticle?.let {

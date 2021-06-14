@@ -19,7 +19,7 @@ internal class CursorToLastFMSongMapperImpl : CursorToLastFMArtistMapper {
                     FullCard(
                         description = getString(getColumnIndexOrThrow(INFO_COLUMN)),
                         infoURL = getString(getColumnIndexOrThrow(CARD_URL_COLUMN)),
-                        source = Source.values()[getColumnIndexOrThrow(SOURCE_COLUMN) - 4],
+                        source = Source.values()[getInt(getColumnIndexOrThrow(SOURCE_COLUMN))],
                         sourceLogoURL = getString(getColumnIndexOrThrow(SOURCE_LOGO_COLUMN))
                     )
                 } else {
