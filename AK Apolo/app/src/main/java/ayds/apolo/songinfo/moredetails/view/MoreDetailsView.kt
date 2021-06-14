@@ -11,7 +11,6 @@ import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
-import ayds.apolo.songinfo.moredetails.view.MoreDetailsUiState.Companion.IMAGE_URL
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.observer.Observable
@@ -114,17 +113,18 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         }
     }
 
-    private fun updateArticleUiState(article: Article) {
-        when (article.isLocallyStoraged) {
-            true -> updateStoredArticleUiState(article)
-            else -> updateNewArticleUiState(article)
+    private fun updateArticleUiState(card: Card) {
+        when (card.isLocallyStoraged) {
+            true -> updateStoredArticleUiState(card)
+            else -> updateNewArticleUiState(card)
         }
     }
 
     private fun updateStoredArticleUiState(card: Card) {
         uiState = uiState.copy(
             articleURL = card.infoURL,
-            artistInfo = STORE_LETTER.plus(card.description)
+            artistInfo = STORE_LETTER.plus(card.description),
+            sourceLogoURL = card.sourceLogoURL
         )
     }
 
@@ -132,6 +132,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         uiState = uiState.copy(
             articleURL = card.infoURL,
             artistInfo = card.description,
+            sourceLogoURL = card.sourceLogoURL
         )
     }
 
@@ -150,7 +151,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun loadLastFMImage() {
-        UtilsModule.imageLoader.loadImageIntoView(IMAGE_URL, imageView)
+        UtilsModule.imageLoader.loadImageIntoView(uiState.sourceLogoURL, imageView)
     }
 
     private fun loadArtistInfo() {

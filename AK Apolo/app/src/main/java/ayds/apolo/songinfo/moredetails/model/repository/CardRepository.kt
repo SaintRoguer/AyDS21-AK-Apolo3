@@ -1,9 +1,7 @@
 package ayds.apolo.songinfo.moredetails.model.repository
 
 import android.util.Log
-import ayds.apolo.songinfo.moredetails.model.entities.Card
-import ayds.apolo.songinfo.moredetails.model.entities.FullCard
-import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
+import ayds.apolo.songinfo.moredetails.model.entities.*
 import ayds.apolo3.lastfm.LastFMInfoService
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.CardLocalStorage
 
@@ -14,7 +12,7 @@ interface ArticleRepository {
 
 internal class ArticleRepositoryImpl(
     private val cardLocalStorage: CardLocalStorage,
-    private val lastFMInfoService:  LastFMInfoService,
+    private val lastFMInfoService: LastFMInfoService,
 ) : ArticleRepository {
 
     override fun getArticleByArtistName(artistName: String): Card {
@@ -26,12 +24,13 @@ internal class ArticleRepositoryImpl(
                 try {
                     val serviceCard = lastFMInfoService.getCardInfo(artistName)
 
-                    serviceCard?.let{
+                    serviceCard?.let {
                         cardArticle = FullCard(
                             it.description,
                             it.infoURL,
-                            it.source,
-                            it.sourceLogoURL
+                            Source.LAST_FM,
+                            it.sourceLogoURL,
+                            true
                         )
                     }
                     cardArticle?.let {
@@ -46,6 +45,6 @@ internal class ArticleRepositoryImpl(
     }
 
     private fun cardInLocalStorage(cardArticle: FullCard) {
-        cardArticle.isLocallyStoraged=true
+        cardArticle.isLocallyStoraged = true
     }
 }

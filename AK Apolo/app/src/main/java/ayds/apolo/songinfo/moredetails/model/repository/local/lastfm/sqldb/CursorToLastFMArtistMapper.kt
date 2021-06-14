@@ -2,6 +2,7 @@ package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
 
 import android.database.Cursor
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard
+import ayds.apolo.songinfo.moredetails.model.entities.Source
 import java.sql.SQLException
 
 interface CursorToLastFMArtistMapper {
@@ -17,8 +18,8 @@ internal class CursorToLastFMSongMapperImpl : CursorToLastFMArtistMapper {
                 if (moveToNext()) {
                     FullCard(
                         description = getString(getColumnIndexOrThrow(INFO_COLUMN)),
-                        infoURL= getString(getColumnIndexOrThrow(CARD_URL_COLUMN)),
-                        source= getInt(getColumnIndexOrThrow(SOURCE_COLUMN)),
+                        infoURL = getString(getColumnIndexOrThrow(CARD_URL_COLUMN)),
+                        source = Source.values()[getColumnIndexOrThrow(SOURCE_COLUMN) - 4],
                         sourceLogoURL = getString(getColumnIndexOrThrow(SOURCE_LOGO_COLUMN))
                     )
                 } else {

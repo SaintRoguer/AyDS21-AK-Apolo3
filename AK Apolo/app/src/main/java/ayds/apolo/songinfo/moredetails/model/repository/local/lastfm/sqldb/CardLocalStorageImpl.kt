@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard
+import ayds.apolo.songinfo.moredetails.model.entities.Source
 import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.CardLocalStorage
 
 private const val DATABASE_VERSION = 1
@@ -22,7 +23,8 @@ internal class CardLocalStorageImpl(
         ARTIST_COLUMN,
         INFO_COLUMN,
         CARD_URL_COLUMN,
-        SOURCE_COLUMN
+        SOURCE_COLUMN,
+        SOURCE_LOGO_COLUMN,
     )
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -35,19 +37,31 @@ internal class CardLocalStorageImpl(
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    override fun saveCard(artistName : String, card : Card) {
-        val column = fillDatabaseWithNewRow(artistName, card.description, card.infoURL, card.source, card.sourceLogoURL)
+    override fun saveCard(artistName: String, card: Card) {
+        val column = fillDatabaseWithNewRow(
+            artistName,
+            card.description,
+            card.infoURL,
+            card.source,
+            card.sourceLogoURL
+        )
         this.writableDatabase.insert(ARTISTS_TABLE, null, column)
     }
 
-    private fun fillDatabaseWithNewRow(artistName : String, description: String, infoURL : String, source : Int, sourceLogoURL : String) =
+    private fun fillDatabaseWithNewRow(
+        artistName: String,
+        description: String,
+        infoURL: String,
+        source: Source,
+        sourceLogoURL: String
+    ) =
         ContentValues().apply {
             put(ARTIST_COLUMN, artistName)
             put(INFO_COLUMN, description)
             put(CARD_URL_COLUMN, infoURL)
-            put(SOURCE_COLUMN, 1)
+            put(SOURCE_COLUMN, source.ordinal)
             put(SOURCE_LOGO_COLUMN, sourceLogoURL)
-    }
+        }
 
     override fun getCard(artistName: String): FullCard? {
         val cursor = readableDatabase.query(
