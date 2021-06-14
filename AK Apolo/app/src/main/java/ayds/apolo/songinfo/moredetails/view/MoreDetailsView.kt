@@ -114,11 +114,10 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         }
     }
 
-    private fun updateArticleUiState(card: Card) {
-        when (moreDetailsModel.searchArticle(ARTIST_NAME)) {
-            null -> updateNewArticleUiState(card)
-            else -> updateStoredArticleUiState(card)
-
+    private fun updateArticleUiState(article: Article) {
+        when (article.isLocallyStoraged) {
+            true -> updateStoredArticleUiState(article)
+            else -> updateNewArticleUiState(article)
         }
     }
 
