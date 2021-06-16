@@ -41,6 +41,8 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var moreDetailsButton: Button
     private lateinit var imageView: ImageView
 
+    private lateinit var sourceInfoPane: TextView
+
     override fun updateUrl(url: String) {
         uiState = uiState.copy(articleURL = url)
     }
@@ -70,6 +72,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
         moreDetailsButton = findViewById(R.id.openUrlButton)
         imageView = findViewById(R.id.imageView)
+        sourceInfoPane = findViewById(R.id.sourceLabel)
     }
 
     private fun initArtistName() {
@@ -124,7 +127,8 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         uiState = uiState.copy(
             articleURL = card.infoURL,
             artistInfo = STORE_LETTER.plus(card.description),
-            sourceLogoURL = card.sourceLogoURL
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source
         )
     }
 
@@ -132,7 +136,8 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         uiState = uiState.copy(
             articleURL = card.infoURL,
             artistInfo = card.description,
-            sourceLogoURL = card.sourceLogoURL
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source
         )
     }
 
@@ -147,6 +152,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         runOnUiThread {
             loadLastFMImage()
             loadArtistInfo()
+            loadSourceInfo()
         }
     }
 
@@ -158,6 +164,10 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         moreDetailsPane.text = Html.fromHtml(
             helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
         )
+    }
+
+    private fun loadSourceInfo(){
+        sourceInfoPane.text = "FROM: "+uiState.sourceLabel.toString()
     }
 
     companion object {
