@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.sqldb
 
 const val ARTISTS_TABLE = "artists"
 const val ARTIST_COLUMN = "artist"

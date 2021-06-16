@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.sqldb
 
 import android.database.Cursor
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard

@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.sqldb
+package ayds.apolo.songinfo.moredetails.model.repository.local.sqldb
 
 import android.content.ContentValues
 import android.content.Context
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard
 import ayds.apolo.songinfo.moredetails.model.entities.Source
-import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.CardLocalStorage
+import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
 
 private const val DATABASE_VERSION = 1
 private const val DATABASE_NAME = "artists.db"

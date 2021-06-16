@@ -3,7 +3,7 @@ package ayds.apolo.songinfo.moredetails.model.repository
 import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.*
 import ayds.apolo3.lastfm.LastFMInfoService
-import ayds.apolo.songinfo.moredetails.model.repository.local.lastfm.CardLocalStorage
+import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
 
 
 interface ArticleRepository {
