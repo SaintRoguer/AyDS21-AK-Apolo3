@@ -19,7 +19,7 @@ internal class CardLocalStorageImpl(
 
     private val projection = arrayOf(
         ID_COLUMN,
-        ARTIST_COLUMN,
+        CARD_COLUMN,
         INFO_COLUMN,
         CARD_URL_COLUMN,
         SOURCE_COLUMN,
@@ -38,12 +38,12 @@ internal class CardLocalStorageImpl(
 
     override fun saveCard(artistName: String, card: Card) {
         val column = fillDatabaseWithNewRow(artistName,card)
-        this.writableDatabase.insert(ARTISTS_TABLE, null, column)
+        this.writableDatabase.insert(CARDS_TABLE, null, column)
     }
 
     private fun fillDatabaseWithNewRow(artistName: String, card : Card) =
         ContentValues().apply {
-            put(ARTIST_COLUMN, artistName)
+            put(CARD_COLUMN, artistName)
             put(INFO_COLUMN, card.description)
             put(CARD_URL_COLUMN, card.infoURL)
             put(SOURCE_COLUMN, card.source.ordinal)
@@ -52,9 +52,9 @@ internal class CardLocalStorageImpl(
 
     override fun getCard(artistName: String): FullCard? {
         val cursor = readableDatabase.query(
-            ARTISTS_TABLE,
+            CARDS_TABLE,
             projection,
-            "$ARTIST_COLUMN = ?",
+            "$CARD_COLUMN = ?",
             arrayOf(artistName),
             null,
             null,
