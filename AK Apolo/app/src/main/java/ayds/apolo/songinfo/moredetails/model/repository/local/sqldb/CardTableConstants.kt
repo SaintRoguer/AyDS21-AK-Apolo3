@@ -6,7 +6,7 @@ const val ID_COLUMN = "id"
 const val INFO_COLUMN = "info"
 const val SOURCE_COLUMN = "source"
 const val CARD_URL_COLUMN = "card_url"
-const val CARD_DESC_COLUMN = "card DESC"
+const val CARD_DESC_COLUMN = "artist DESC"
 const val SOURCE_LOGO_COLUMN = "source_logo"
 
 const val createArtistsTableQuery: String =
