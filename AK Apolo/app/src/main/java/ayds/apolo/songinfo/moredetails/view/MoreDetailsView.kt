@@ -32,7 +32,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
     private lateinit var moreDetailsModel: MoreDetailsModel
-    private val helperArticleInfo = MoreDetailsViewModule.helperArticleInfo
+    private val helperCardInfo = MoreDetailsViewModule.helperCardInfo
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiState: MoreDetailsUiState = MoreDetailsUiState()
@@ -85,7 +85,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun initURLButtonListener() {
         moreDetailsButton.setOnClickListener {
-            notifyFullArticleAction()
+            notifyFullCardAction()
         }
     }
 
@@ -94,14 +94,14 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun initObservers() {
-        moreDetailsModel.articleObservable()
+        moreDetailsModel.cardObservable()
             .subscribe { value ->
                 updateCard(value)
             }
     }
 
-    private fun notifyFullArticleAction() {
-        onActionSubject.notify(MoreDetailsUiEvent.ViewFullArticle)
+    private fun notifyFullCardAction() {
+        onActionSubject.notify(MoreDetailsUiEvent.ViewFullCard)
     }
 
     override fun updateCard(card: Card) {
@@ -112,30 +112,30 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun updateUiState(card: Card) {
         when (card) {
             is EmptyCard -> updateNoResultsUiState()
-            else -> updateArticleUiState(card)
+            else -> updateCardUiState(card)
         }
     }
 
-    private fun updateArticleUiState(card: Card) {
+    private fun updateCardUiState(card: Card) {
         when (card.isLocallyStoraged) {
-            true -> updateStoredArticleUiState(card)
-            else -> updateNewArticleUiState(card)
+            true -> updateStoredCardUiState(card)
+            else -> updateNewCardUiState(card)
         }
     }
 
-    private fun updateStoredArticleUiState(card: Card) {
+    private fun updateStoredCardUiState(card: Card) {
         uiState = uiState.copy(
             articleURL = card.infoURL,
-            artistInfo = STORE_LETTER.plus(card.description),
+            cardInfo = STORE_LETTER.plus(card.description),
             sourceLogoURL = card.sourceLogoURL,
             sourceLabel = card.source
         )
     }
 
-    private fun updateNewArticleUiState(card: Card) {
+    private fun updateNewCardUiState(card: Card) {
         uiState = uiState.copy(
             articleURL = card.infoURL,
-            artistInfo = card.description,
+            cardInfo = card.description,
             sourceLogoURL = card.sourceLogoURL,
             sourceLabel = card.source
         )
@@ -144,7 +144,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun updateNoResultsUiState() {
         uiState = uiState.copy(
             articleURL = "",
-            artistInfo = "Información no encontrada!"
+            cardInfo = "Información no encontrada!"
         )
     }
 
@@ -162,7 +162,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun loadArtistInfo() {
         moreDetailsPane.text = Html.fromHtml(
-            helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
+            helperCardInfo.getTextToHtml(uiState.cardInfo, uiState.artistName)
         )
     }
 

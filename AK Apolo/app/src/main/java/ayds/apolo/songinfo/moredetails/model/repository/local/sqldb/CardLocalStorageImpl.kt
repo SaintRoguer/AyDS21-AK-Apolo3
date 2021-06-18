@@ -6,11 +6,10 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard
-import ayds.apolo.songinfo.moredetails.model.entities.Source
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
 
 private const val DATABASE_VERSION = 1
-private const val DATABASE_NAME = "artists.db"
+private const val DATABASE_NAME = "cards.db"
 
 internal class CardLocalStorageImpl(
     context: Context,
@@ -38,29 +37,17 @@ internal class CardLocalStorageImpl(
     }
 
     override fun saveCard(artistName: String, card: Card) {
-        val column = fillDatabaseWithNewRow(
-            artistName,
-            card.description,
-            card.infoURL,
-            card.source,
-            card.sourceLogoURL
-        )
+        val column = fillDatabaseWithNewRow(artistName,card)
         this.writableDatabase.insert(ARTISTS_TABLE, null, column)
     }
 
-    private fun fillDatabaseWithNewRow(
-        artistName: String,
-        description: String,
-        infoURL: String,
-        source: Source,
-        sourceLogoURL: String
-    ) =
+    private fun fillDatabaseWithNewRow(artistName: String, card : Card) =
         ContentValues().apply {
             put(ARTIST_COLUMN, artistName)
-            put(INFO_COLUMN, description)
-            put(CARD_URL_COLUMN, infoURL)
-            put(SOURCE_COLUMN, source.ordinal)
-            put(SOURCE_LOGO_COLUMN, sourceLogoURL)
+            put(INFO_COLUMN, card.description)
+            put(CARD_URL_COLUMN, card.infoURL)
+            put(SOURCE_COLUMN, card.source.ordinal)
+            put(SOURCE_LOGO_COLUMN, card.sourceLogoURL)
         }
 
     override fun getCard(artistName: String): FullCard? {
@@ -71,7 +58,7 @@ internal class CardLocalStorageImpl(
             arrayOf(artistName),
             null,
             null,
-            ARTIST_DESC_COLUMN
+            CARD_DESC_COLUMN
         )
         return cursorToLastFMArtistMapper.map(cursor)
     }

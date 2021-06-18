@@ -1,8 +1,8 @@
 package ayds.apolo.songinfo.moredetails.model
 
 import android.content.Context
-import ayds.apolo.songinfo.moredetails.model.repository.ArticleRepository
-import ayds.apolo.songinfo.moredetails.model.repository.ArticleRepositoryImpl
+import ayds.apolo.songinfo.moredetails.model.repository.CardRepository
+import ayds.apolo.songinfo.moredetails.model.repository.CardRepositoryImpl
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
 import ayds.apolo.songinfo.moredetails.model.repository.local.sqldb.CardLocalStorageImpl
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
@@ -22,8 +22,8 @@ object MoreDetailsModelModule {
         )
         val lastFMInfoService: LastFMInfoService = LastFMModule.lastFMInfoService
 
-        val repository: ArticleRepository =
-            ArticleRepositoryImpl(artistLocalStorage, lastFMInfoService)
+        val repository: CardRepository =
+            CardRepositoryImpl(artistLocalStorage, lastFMInfoService)
 
         moreDetailsModel = MoreDetailsModelImpl(repository)
     }

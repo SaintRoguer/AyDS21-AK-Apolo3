@@ -23,18 +23,18 @@ internal class MoreDetailsControllerImpl(
     private val observer: Observer<MoreDetailsUiEvent> =
         Observer { value ->
             when (value) {
-                MoreDetailsUiEvent.ViewFullArticle -> viewFullArticle()
-                MoreDetailsUiEvent.OnCreated -> searchArticle()
+                MoreDetailsUiEvent.ViewFullCard -> viewFullCard()
+                MoreDetailsUiEvent.OnCreated -> searchCard()
             }
         }
 
-    private fun searchArticle() {
+    private fun searchCard() {
         Thread {
-            moreDetailsModel.searchArticle(moreDetailsView.uiState.artistName)
+            moreDetailsModel.searchCard(moreDetailsView.uiState.artistName)
         }.start()
     }
 
-    private fun viewFullArticle() {
+    private fun viewFullCard() {
         moreDetailsView.openCardURLActivity()
     }
 }
