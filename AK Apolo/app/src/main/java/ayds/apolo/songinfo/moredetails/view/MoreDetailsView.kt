@@ -44,7 +44,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var sourceInfoPane: TextView
 
     override fun updateUrl(url: String) {
-        uiState = uiState.copy(articleURL = url)
+        uiState = uiState.copy(cardURL = url)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +90,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     override fun openCardURLActivity() {
-        openExternalUrl(uiState.articleURL)
+        openExternalUrl(uiState.cardURL)
     }
 
     private fun initObservers() {
@@ -125,7 +125,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateStoredCardUiState(card: Card) {
         uiState = uiState.copy(
-            articleURL = card.infoURL,
+            cardURL = card.infoURL,
             cardInfo = STORE_LETTER.plus(card.description),
             sourceLogoURL = card.sourceLogoURL,
             sourceLabel = card.source
@@ -134,7 +134,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateNewCardUiState(card: Card) {
         uiState = uiState.copy(
-            articleURL = card.infoURL,
+            cardURL = card.infoURL,
             cardInfo = card.description,
             sourceLogoURL = card.sourceLogoURL,
             sourceLabel = card.source
@@ -143,7 +143,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateNoResultsUiState() {
         uiState = uiState.copy(
-            articleURL = "",
+            cardURL = "",
             cardInfo = "Información no encontrada!"
         )
     }

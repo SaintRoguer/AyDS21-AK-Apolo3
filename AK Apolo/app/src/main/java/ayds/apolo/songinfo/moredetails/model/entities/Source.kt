@@ -1,7 +1,7 @@
 package ayds.apolo.songinfo.moredetails.model.entities
 
 
-enum class Source(s: String) {
+enum class Source(service: String) {
     LAST_FM("Last FM"),
     NO("None")
 }
