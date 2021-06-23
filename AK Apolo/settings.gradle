@@ -1,5 +1,7 @@
 include ':lastfmdata'
 project(':lastfmdata').projectDir = new File('libs/LastFMData')
+include ':nytimesdata'
+project(':nytimesdata').projectDir = new File('libs/NYTimesData')
 include ':app'
 include 'observer'
 rootProject.name = "AK Apolo"
