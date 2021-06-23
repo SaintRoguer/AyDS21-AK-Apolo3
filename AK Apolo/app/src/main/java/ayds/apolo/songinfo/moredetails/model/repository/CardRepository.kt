@@ -14,6 +14,7 @@ interface CardRepository {
 internal class CardRepositoryImpl(
     private val cardLocalStorage: CardLocalStorage,
     private val lastFMInfoService: LastFMInfoService,
+    private val broker:Broker
 ) : CardRepository {
 
     override fun getArticleByArtistName(artistName: String): Card {
@@ -23,9 +24,9 @@ internal class CardRepositoryImpl(
             cardArticle != null -> cardInLocalStorage(cardArticle)
             else -> {
                 try {
-                    val serviceCard = lastFMInfoService.getCardInfo(artistName)
+                    val serviceCards = broker.getCards(artistName)
 
-                    serviceCard?.let {
+                    serviceCards?.let {
                         cardArticle = initFullCard(it)
                     }
 

@@ -50,6 +50,7 @@ dependencies {
 
     implementation 'androidx.sqlite:sqlite-ktx:2.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation project(path: ':nytimesdata')
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
