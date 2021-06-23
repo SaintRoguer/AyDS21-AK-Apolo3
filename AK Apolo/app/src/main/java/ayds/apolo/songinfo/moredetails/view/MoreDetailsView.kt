@@ -9,10 +9,8 @@ import android.widget.TextView
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
-import ayds.apolo.songinfo.moredetails.model.entities.Article
-import ayds.apolo.songinfo.moredetails.model.entities.ArtistArticle
-import ayds.apolo.songinfo.moredetails.model.entities.EmptyArticle
-import ayds.apolo.songinfo.moredetails.view.MoreDetailsUiState.Companion.IMAGE_URL
+import ayds.apolo.songinfo.moredetails.model.entities.Card
+import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.observer.Observable
@@ -25,8 +23,8 @@ interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
     val uiState: MoreDetailsUiState
 
-    fun updateArticle(article: Article)
-    fun openArticleURLActivity()
+    fun updateCard(card: Card)
+    fun openCardURLActivity()
     fun updateUrl(url: String)
 }
 
@@ -34,7 +32,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
     private lateinit var moreDetailsModel: MoreDetailsModel
-    private val helperArticleInfo = MoreDetailsViewModule.helperArticleInfo
+    private val helperCardInfo = MoreDetailsViewModule.helperCardInfo
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiState: MoreDetailsUiState = MoreDetailsUiState()
@@ -43,8 +41,10 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var moreDetailsButton: Button
     private lateinit var imageView: ImageView
 
+    private lateinit var sourceInfoPane: TextView
+
     override fun updateUrl(url: String) {
-        uiState = uiState.copy(articleURL = url)
+        uiState = uiState.copy(cardURL = url)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +72,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
         moreDetailsButton = findViewById(R.id.openUrlButton)
         imageView = findViewById(R.id.imageView)
+        sourceInfoPane = findViewById(R.id.sourceLabel)
     }
 
     private fun initArtistName() {
@@ -84,62 +85,66 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun initURLButtonListener() {
         moreDetailsButton.setOnClickListener {
-            notifyFullArticleAction()
+            notifyFullCardAction()
         }
     }
 
-    override fun openArticleURLActivity() {
-        openExternalUrl(uiState.articleURL)
+    override fun openCardURLActivity() {
+        openExternalUrl(uiState.cardURL)
     }
 
     private fun initObservers() {
-        moreDetailsModel.articleObservable()
+        moreDetailsModel.cardObservable()
             .subscribe { value ->
-                updateArticle(value)
+                updateCard(value)
             }
     }
 
-    private fun notifyFullArticleAction() {
-        onActionSubject.notify(MoreDetailsUiEvent.ViewFullArticle)
+    private fun notifyFullCardAction() {
+        onActionSubject.notify(MoreDetailsUiEvent.ViewFullCard)
     }
 
-    override fun updateArticle(article: Article) {
-        updateUiState(article)
+    override fun updateCard(card: Card) {
+        updateUiState(card)
         updateArtistInfoUI()
     }
 
-    private fun updateUiState(article: Article) {
-        when (article) {
-            is ArtistArticle -> updateArticleUiState(article)
-            EmptyArticle -> updateNoResultsUiState()
+    private fun updateUiState(card: Card) {
+        when (card) {
+            is EmptyCard -> updateNoResultsUiState()
+            else -> updateCardUiState(card)
         }
     }
 
-    private fun updateArticleUiState(article: Article) {
-        when (article.isLocallyStoraged) {
-            true -> updateStoredArticleUiState(article)
-            else -> updateNewArticleUiState(article)
+    private fun updateCardUiState(card: Card) {
+        when (card.isLocallyStoraged) {
+            true -> updateStoredCardUiState(card)
+            else -> updateNewCardUiState(card)
         }
     }
 
-    private fun updateStoredArticleUiState(article: Article) {
+    private fun updateStoredCardUiState(card: Card) {
         uiState = uiState.copy(
-            articleURL = article.articleURL,
-            artistInfo = STORE_LETTER.plus(article.articleInfo)
+            cardURL = card.infoURL,
+            cardInfo = STORE_LETTER.plus(card.description),
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source
         )
     }
 
-    private fun updateNewArticleUiState(article: Article) {
+    private fun updateNewCardUiState(card: Card) {
         uiState = uiState.copy(
-            articleURL = article.articleURL,
-            artistInfo = article.articleInfo,
+            cardURL = card.infoURL,
+            cardInfo = card.description,
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source
         )
     }
 
     private fun updateNoResultsUiState() {
         uiState = uiState.copy(
-            articleURL = "",
-            artistInfo = "Información no encontrada!"
+            cardURL = "",
+            cardInfo = "Información no encontrada!"
         )
     }
 
@@ -147,17 +152,22 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         runOnUiThread {
             loadLastFMImage()
             loadArtistInfo()
+            loadSourceInfo()
         }
     }
 
     private fun loadLastFMImage() {
-        UtilsModule.imageLoader.loadImageIntoView(IMAGE_URL, imageView)
+        UtilsModule.imageLoader.loadImageIntoView(uiState.sourceLogoURL, imageView)
     }
 
     private fun loadArtistInfo() {
         moreDetailsPane.text = Html.fromHtml(
-            helperArticleInfo.getTextToHtml(uiState.artistInfo, uiState.artistName)
+            helperCardInfo.getTextToHtml(uiState.cardInfo, uiState.artistName)
         )
+    }
+
+    private fun loadSourceInfo(){
+        sourceInfoPane.text = "FROM: "+uiState.sourceLabel.toString()
     }
 
     companion object {

@@ -1,13 +1,15 @@
 package ayds.apolo.songinfo.moredetails.view
 
+import ayds.apolo.songinfo.moredetails.model.entities.Source
+
 data class MoreDetailsUiState(
     val artistName: String = "",
-    val articleURL: String = "",
-    val artistInfo: String = ""
-){
+    val cardURL: String = "",
+    val cardInfo: String = "",
+    var sourceLogoURL: String = "",
+    val sourceLabel: Source=Source.NO
+)
 
-    companion object {
-        const val IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lastfm_logo.svg/320px-Lastfm_logo.svg.png"
-    }
-}
+
+
 
