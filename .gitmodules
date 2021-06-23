@@ -1,3 +1,6 @@
 [submodule "AK Apolo/libs/LastFMData"]
 	path = AK Apolo/libs/LastFMData
 	url = https://github.com/LPacione/AK-Apolo3-LastFMData.git
+[submodule "AK Apolo/libs/NYTimesData"]
+	path = AK Apolo/libs/NYTimesData
+	url = https://github.com/GiannFrancoo/AK-Hera2-NYTimesData.git
