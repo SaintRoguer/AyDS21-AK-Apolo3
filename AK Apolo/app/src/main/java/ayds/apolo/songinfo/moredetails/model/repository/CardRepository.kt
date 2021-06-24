@@ -13,7 +13,6 @@ interface CardRepository {
 
 internal class CardRepositoryImpl(
     private val cardLocalStorage: CardLocalStorage,
-    private val lastFMInfoService: LastFMInfoService,
     private val broker:Broker
 ) : CardRepository {
 

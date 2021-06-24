@@ -22,37 +22,32 @@ internal abstract class ProxyImpl:Proxy{
 internal class LastFMProxy(
     private val lastFMInfoService: LastFMInfoService = LastFMModule.lastFMInfoService
 ): ProxyImpl() {
+
     override fun mapCard(artistName:String): Card  =
         helperCardInitiator.initFullCard(callService(artistName),Source.LAST_FM)
 
     private fun callService(artistName:String) =
         lastFMInfoService.getCardInfo(artistName)
-
-
 }
 
 internal class NewYorkProxy(
     private val nytArticleService: NYTArticleService = NYTModule.nytArticleService
 ): ProxyImpl() {
+
     override fun mapCard(artistName: String): Card {
-        val callService = callService(artistName)
-        when {
-            callService != null -> return callService?.let{
+        return when (val callService = callService(artistName)) {
+             null -> callService?.let{
                 helperCardInitiator.initFullCard(
-                    (
-                            ayds.jkhera2.nytimes.entities.Article.it,
-                    Source.NEW_YORK_TIMES
-                    )
-                    else -> return EmptyCard
+                    (callService,Source.NEW_YORK_TIMES)
                 }
+            else -> EmptyCard
             }
         }
-    }
-
 
     private fun callService(artistName:String) =
         nytArticleService.getArticleInfo(artistName)
 }
+
 
 /*internal class WikipediaProxy(
 ): ProxyImpl() {
