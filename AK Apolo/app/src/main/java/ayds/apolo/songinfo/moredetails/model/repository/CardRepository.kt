@@ -2,8 +2,8 @@ package ayds.apolo.songinfo.moredetails.model.repository
 
 import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.*
-import ayds.apolo3.lastfm.LastFMInfoService
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
+import ayds.apolo.songinfo.moredetails.model.repository.local.broker.Broker
 import ayds.apolo3.lastfm.Article
 
 
@@ -13,8 +13,10 @@ interface CardRepository {
 
 internal class CardRepositoryImpl(
     private val cardLocalStorage: CardLocalStorage,
-    private val broker:Broker
+    private val broker : Broker
 ) : CardRepository {
+
+
 
     override fun getArticleByArtistName(artistName: String): Card {
         var cardArticle = cardLocalStorage.getCard(artistName)
