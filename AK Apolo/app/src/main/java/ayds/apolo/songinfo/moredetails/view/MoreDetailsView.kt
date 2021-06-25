@@ -21,7 +21,8 @@ private const val STORE_LETTER = "*\n\n"
 
 interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
-    val uiState: MoreDetailsUiState
+    val uiStateLastFM: MoreDetailsUiState
+    val uiStateNYTimes: MoreDetailsUiState
 
     fun updateCard(card: Card)
     fun openCardURLActivity()
@@ -35,7 +36,9 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private val helperCardInfo = MoreDetailsViewModule.helperCardInfo
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
-    override var uiState: MoreDetailsUiState = MoreDetailsUiState()
+    override var uiStateLastFM: MoreDetailsUiState = MoreDetailsUiState()
+    override var uiStateNYTimes: MoreDetailsUiState = MoreDetailsUiState()
+
 
     private lateinit var moreDetailsPane: TextView
     private lateinit var moreDetailsButton: Button
@@ -44,7 +47,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var sourceInfoPane: TextView
 
     override fun updateUrl(url: String) {
-        uiState = uiState.copy(cardURL = url)
+        uiStateLastFM = uiStateLastFM.copy(cardURL = url)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +79,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun initArtistName() {
-        uiState = uiState.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
+        uiStateLastFM = uiStateLastFM.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
     }
 
     private fun initListeners() {
@@ -90,7 +93,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     override fun openCardURLActivity() {
-        openExternalUrl(uiState.cardURL)
+        openExternalUrl(uiStateLastFM.cardURL)
     }
 
     private fun initObservers() {
@@ -124,7 +127,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun updateStoredCardUiState(card: Card) {
-        uiState = uiState.copy(
+        uiStateLastFM = uiStateLastFM.copy(
             cardURL = card.infoURL,
             cardInfo = STORE_LETTER.plus(card.description),
             sourceLogoURL = card.sourceLogoURL,
@@ -133,7 +136,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun updateNewCardUiState(card: Card) {
-        uiState = uiState.copy(
+        uiStateLastFM = uiStateLastFM.copy(
             cardURL = card.infoURL,
             cardInfo = card.description,
             sourceLogoURL = card.sourceLogoURL,
@@ -142,7 +145,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun updateNoResultsUiState() {
-        uiState = uiState.copy(
+        uiStateLastFM = uiStateLastFM.copy(
             cardURL = "",
             cardInfo = "Información no encontrada!"
         )
@@ -157,17 +160,17 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun loadLastFMImage() {
-        UtilsModule.imageLoader.loadImageIntoView(uiState.sourceLogoURL, imageView)
+        UtilsModule.imageLoader.loadImageIntoView(uiStateLastFM.sourceLogoURL, imageView)
     }
 
     private fun loadArtistInfo() {
         moreDetailsPane.text = Html.fromHtml(
-            helperCardInfo.getTextToHtml(uiState.cardInfo, uiState.artistName)
+            helperCardInfo.getTextToHtml(uiStateLastFM.cardInfo, uiStateLastFM.artistName)
         )
     }
 
     private fun loadSourceInfo(){
-        sourceInfoPane.text = "FROM: "+uiState.sourceLabel.toString()
+        sourceInfoPane.text = "FROM: "+uiStateLastFM.sourceLabel.toString()
     }
 
     companion object {

@@ -18,8 +18,10 @@ internal class MoreDetailsModelImpl(private val repository: CardRepository) :
     private val cardSubject = Subject<Card>()
 
     override fun searchCard(artistName: String) {
-        repository.getArticleByArtistName(artistName).let {
-            cardSubject.notify(it)
+        repository.getArticleByArtistName(artistName).let { card ->
+            card.forEach{
+                cardSubject.notify(it)
+            }
         }
     }
 

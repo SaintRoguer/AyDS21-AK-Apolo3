@@ -12,21 +12,21 @@ internal class NewYorkProxy(
     private val nytArticleService: NYTArticleService
 ) : Proxy {
 
-    override fun getCard(artistName: String): Card =
-        initFullCard(
-            callService(artistName), Source.NEW_YORK_TIMES
-        )
+    override fun getCard(artistName: String, cards: MutableList<Card>): MutableList<Card> =
+        cards.apply {
+            add(initFullCard(callService(artistName)))
+        }
 
     private fun callService(artistName: String) =
         nytArticleService.getArticleInfo(artistName)
 
-    private fun initFullCard(article: Article?, source: Source) =
+    private fun initFullCard(article: Article?) =
         when (article) {
             null -> EmptyCard
             else -> FullCard(
                 article.description,
                 article.infoUrl,
-                source,
+                Source.NEW_YORK_TIMES,
                 article.sourceLogoUrl
             )
         }

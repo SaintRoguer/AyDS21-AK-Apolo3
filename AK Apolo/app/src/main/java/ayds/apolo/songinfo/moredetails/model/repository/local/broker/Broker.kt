@@ -14,8 +14,7 @@ internal class Broker(
 
     override fun getCards(artistName: String): List<Card> {
         proxies.forEach {
-            val card = it.getCard(artistName)
-            cards.add(card)
+            it.getCard(artistName, cards)
         }
         return cards
     }

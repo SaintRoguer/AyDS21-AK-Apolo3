@@ -5,7 +5,7 @@ import ayds.apolo.songinfo.moredetails.model.entities.FullCard
 
 interface CardLocalStorage {
 
-    fun saveCard(artistName : String, card : Card)
+    fun saveCards(artistName : String, cards : List<Card>)
 
-    fun getCard(artistName: String): FullCard?
+    fun getCards(artistName: String): List<Card>
 }

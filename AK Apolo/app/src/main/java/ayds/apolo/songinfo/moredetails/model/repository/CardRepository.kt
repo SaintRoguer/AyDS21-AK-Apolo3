@@ -1,14 +1,12 @@
 package ayds.apolo.songinfo.moredetails.model.repository
 
-import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.*
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
 import ayds.apolo.songinfo.moredetails.model.repository.local.broker.Broker
-import ayds.apolo3.lastfm.Article
 
 
 interface CardRepository {
-    fun getArticleByArtistName(artistName: String): Card
+    fun getArticleByArtistName(artistName: String): List<Card>
 }
 
 internal class CardRepositoryImpl(
@@ -18,39 +16,24 @@ internal class CardRepositoryImpl(
 
 
 
-    override fun getArticleByArtistName(artistName: String): Card {
-        var cardArticle = cardLocalStorage.getCard(artistName)
-        when {
+    override fun getArticleByArtistName(artistName: String): List<Card> {
+        val cardsArticles = cardLocalStorage.getCards(artistName)
+        var isInLocalStorage = false
 
-            cardArticle != null -> cardInLocalStorage(cardArticle)
-            else -> {
-                try {
-                    val serviceCards = broker.getCards(artistName)
-
-                    serviceCards?.let {
-                        cardArticle = initFullCard(it)
-                    }
-
-                    cardArticle?.let {
-                        cardLocalStorage.saveCard(artistName, it)
-                    }
-                } catch (e: Exception) {
-                    Log.e("Artist Article", "ERROR: $e")
-                }
+        cardsArticles.forEach {
+            if (it is FullCard) {
+                cardInLocalStorage(it)
+                isInLocalStorage = true
             }
         }
-        return cardArticle ?: EmptyCard
+        if(!isInLocalStorage){
+            val serviceCards = broker.getCards(artistName)
+            cardLocalStorage.saveCards(artistName, serviceCards)
+        }
+        return cardsArticles
     }
 
-    private fun cardInLocalStorage(cardArticle: FullCard) {
+    private fun cardInLocalStorage(cardArticle: Card) {
         cardArticle.isLocallyStoraged = true
     }
-
-    private fun initFullCard(article: Article) =
-        FullCard(
-            article.description,
-            article.infoURL,
-            Source.LAST_FM,
-            article.sourceLogoURL
-        )
 }

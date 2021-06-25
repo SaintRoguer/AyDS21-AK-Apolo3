@@ -5,26 +5,31 @@ import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard
 import ayds.apolo.songinfo.moredetails.model.entities.Source
 import ayds.apolo3.lastfm.Article
+import ayds.apolo3.lastfm.ArtistArticle
+import ayds.apolo3.lastfm.EmptyArticle
 import ayds.apolo3.lastfm.LastFMInfoService
 
 internal class LastFMProxy(
     private val lastFMInfoService: LastFMInfoService
 ) : Proxy {
 
-    override fun getCard(artistName: String): Card =
-        initFullCard(callService(artistName), Source.LAST_FM)
+    override fun getCard(artistName: String, cards: MutableList<Card>): MutableList<Card> =
+        cards.apply {
+            add(initFullCard(callService(artistName)))
+        }
 
     private fun callService(artistName: String) =
         lastFMInfoService.getCardInfo(artistName)
 
-    private fun initFullCard(article: Article?, source: Source) =
+    private fun initFullCard(article: Article?) =
         when (article) {
-            null -> EmptyCard
-            else -> FullCard(
+            EmptyArticle -> EmptyCard
+            is ArtistArticle -> FullCard(
                 article.description,
                 article.infoURL,
-                source,
+                Source.LAST_FM,
                 article.sourceLogoURL
             )
+            else ->EmptyCard
         }
 }
