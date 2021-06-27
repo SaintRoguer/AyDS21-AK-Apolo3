@@ -14,26 +14,30 @@ internal class CardRepositoryImpl(
     private val broker : Broker
 ) : CardRepository {
 
-
+    private var isInLocalStorage = false
 
     override fun getArticleByArtistName(artistName: String): List<Card> {
         val cardsArticles = cardLocalStorage.getCards(artistName)
-        var isInLocalStorage = false
 
         cardsArticles.forEach {
-            if (it is FullCard) {
-                cardInLocalStorage(it)
-                isInLocalStorage = true
-            }
+            setStorage(it)
         }
+
         if(!isInLocalStorage){
-            val serviceCards = broker.getCards(artistName)
-            cardLocalStorage.saveCards(artistName, serviceCards)
+            cardLocalStorage.saveCards(artistName, broker.getCards(artistName))
         }
+
         return cardsArticles
     }
 
-    private fun cardInLocalStorage(cardArticle: Card) {
+    private fun setStorage (cardArticle : Card) {
+        if (cardArticle is FullCard) {
+            cardInLocalStorage(cardArticle)
+            isInLocalStorage = true
+        }
+    }
+
+    private fun cardInLocalStorage(cardArticle : Card) {
         cardArticle.isLocallyStoraged = true
     }
 }

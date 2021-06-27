@@ -7,14 +7,14 @@ interface IBroker {
 }
 
 internal class Broker(
-    private val proxies: List<Proxy>,
+    private val proxies: List<Proxy>
 ) : IBroker {
 
     private lateinit var cards: MutableList<Card>
 
     override fun getCards(artistName: String): List<Card> {
         proxies.forEach {
-            it.getCard(artistName, cards)
+            cards.add(it.getCard(artistName))
         }
         return cards
     }

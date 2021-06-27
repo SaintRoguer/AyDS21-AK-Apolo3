@@ -23,7 +23,7 @@ object MoreDetailsModelModule {
 
         val newYorkProxy = NewYorkProxy(NYTModule.nytArticleService)
         val lastFMProxy = LastFMProxy(LastFMModule.lastFMInfoService)
-        val broker = Broker(listOf(lastFMProxy,newYorkProxy))
+        val broker = Broker(listOf(lastFMProxy, newYorkProxy))
 
         val artistLocalStorage: CardLocalStorage = CardLocalStorageImpl(
             moreDetailsView as Context, CursorToLastFMSongMapperImpl()
