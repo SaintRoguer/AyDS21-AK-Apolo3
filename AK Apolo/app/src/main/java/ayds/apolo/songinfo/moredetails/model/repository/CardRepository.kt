@@ -19,15 +19,16 @@ internal class CardRepositoryImpl(
     override fun getArticleByArtistName(artistName: String): List<Card> {
         val cardsArticles = cardLocalStorage.getCards(artistName)
 
-        cardsArticles.forEach {
-            setStorage(it)
-        }
-
         if(!isInLocalStorage){
             cardLocalStorage.saveCards(artistName, broker.getCards(artistName))
         }
+        else{
+            cardsArticles.forEach {
+                setStorage(it)
+            }
+        }
 
-        return cardsArticles
+        return cardsArticles //Chequear si son toda la lista esta vacia.
     }
 
     private fun setStorage (cardArticle : Card) {
