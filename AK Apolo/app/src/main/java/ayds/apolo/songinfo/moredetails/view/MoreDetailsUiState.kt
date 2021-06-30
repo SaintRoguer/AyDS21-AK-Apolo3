@@ -7,7 +7,7 @@ data class MoreDetailsUiState(
     val cardURL: String = "",
     val cardInfo: String = "",
     var sourceLogoURL: String = "",
-    val sourceLabel: Source=Source.NO
+    var sourceLabel: Source = Source.NO
 )
 
 

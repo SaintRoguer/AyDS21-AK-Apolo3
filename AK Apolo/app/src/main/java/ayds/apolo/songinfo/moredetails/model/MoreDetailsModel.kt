@@ -18,9 +18,7 @@ internal class MoreDetailsModelImpl(private val repository: CardRepository) :
     private val cardSubject = Subject<Card>()
 
     override fun searchCards(artistName: String) {
-        for (card in repository.getArticleByArtistName(artistName)) {
-            cardSubject.notify(card)
-        }
+        cardSubject.notify(repository.getArticleByArtistName(artistName))
     }
 
     override fun cardObservable(): Observable<Card> = cardSubject
