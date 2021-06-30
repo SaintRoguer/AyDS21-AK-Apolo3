@@ -10,7 +10,7 @@ internal class Broker(
     private val proxies: List<Proxy>
 ) : IBroker {
 
-    private lateinit var cards: MutableList<Card>
+    private var cards: MutableList<Card> = mutableListOf()
 
     override fun getCards(artistName: String): List<Card> {
         proxies.forEach {
