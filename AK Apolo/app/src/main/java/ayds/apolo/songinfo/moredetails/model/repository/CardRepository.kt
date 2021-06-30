@@ -3,6 +3,7 @@ package ayds.apolo.songinfo.moredetails.model.repository
 import ayds.apolo.songinfo.moredetails.model.entities.*
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
 import ayds.apolo.songinfo.moredetails.model.repository.local.broker.Broker
+import ayds.apolo3.lastfm.EmptyArticle
 
 
 interface CardRepository {
@@ -28,7 +29,18 @@ internal class CardRepositoryImpl(
             }
         }
 
-        return cardsArticles //Chequear si son toda la lista esta vacia.
+        var allFullCards = true
+        for (cardsArticle in cardsArticles) {
+            if (cardsArticle is EmptyCard)
+                allFullCards = false
+        }
+        when(allFullCards){
+            true -> return cardsArticles
+            false -> {
+                var emptyCards : List<Card> = listOf()
+                return emptyCards
+            }
+        }
     }
 
     private fun setStorage (cardArticle : Card) {

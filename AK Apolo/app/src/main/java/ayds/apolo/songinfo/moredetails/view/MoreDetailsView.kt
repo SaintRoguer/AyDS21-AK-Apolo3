@@ -23,8 +23,9 @@ interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
     val uiStateLastFM: MoreDetailsUiState
     val uiStateNYTimes: MoreDetailsUiState
+    val uiStateWikipedia: MoreDetailsUiState
 
-    fun updateCard(card: Card)
+    fun updateCard(card: List<Card>)
     fun openCardURLActivity()
     fun updateUrl(url: String)
 }
@@ -38,7 +39,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiStateLastFM: MoreDetailsUiState = MoreDetailsUiState()
     override var uiStateNYTimes: MoreDetailsUiState = MoreDetailsUiState()
-
+    override var uiStateWikipedia: MoreDetailsUiState = MoreDetailsUiState()
 
     private lateinit var moreDetailsPane: TextView
     private lateinit var moreDetailsButton: Button
@@ -107,9 +108,11 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullCard)
     }
 
-    override fun updateCard(card: Card) {
-        updateUiState(card)
-        updateArtistInfoUI()
+    override fun updateCard(cards: List<Card>) {
+        for (card in cards) {
+            updateUiState(card)
+            updateArtistInfoUI(card)
+        }
     }
 
     private fun updateUiState(card: Card) {
@@ -131,12 +134,40 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
             cardURL = card.infoURL,
             cardInfo = STORE_LETTER.plus(card.description),
             sourceLogoURL = card.sourceLogoURL,
-            sourceLabel = card.source
+            sourceLabel = card.source,
+        )
+
+        uiStateNYTimes = uiStateNYTimes.copy(
+            cardURL = card.infoURL,
+            cardInfo = STORE_LETTER.plus(card.description),
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source,
+        )
+
+        uiStateWikipedia = uiStateWikipedia.copy(
+            cardURL = card.infoURL,
+            cardInfo = STORE_LETTER.plus(card.description),
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source,
         )
     }
 
     private fun updateNewCardUiState(card: Card) {
         uiStateLastFM = uiStateLastFM.copy(
+            cardURL = card.infoURL,
+            cardInfo = card.description,
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source
+        )
+
+        uiStateNYTimes = uiStateNYTimes.copy(
+            cardURL = card.infoURL,
+            cardInfo = card.description,
+            sourceLogoURL = card.sourceLogoURL,
+            sourceLabel = card.source
+        )
+
+        uiStateWikipedia = uiStateWikipedia.copy(
             cardURL = card.infoURL,
             cardInfo = card.description,
             sourceLogoURL = card.sourceLogoURL,
@@ -149,9 +180,19 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
             cardURL = "",
             cardInfo = "Información no encontrada!"
         )
+
+        uiStateNYTimes = uiStateNYTimes.copy(
+            cardURL = "",
+            cardInfo = "Información no encontrada!"
+        )
+
+        uiStateWikipedia = uiStateWikipedia.copy(
+            cardURL = "",
+            cardInfo = "Información no encontrada!"
+        )
     }
 
-    private fun updateArtistInfoUI() {
+    private fun updateArtistInfoUI(card: Card) {
         runOnUiThread {
             loadLastFMImage()
             loadArtistInfo()
