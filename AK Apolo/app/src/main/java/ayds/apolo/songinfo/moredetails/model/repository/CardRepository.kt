@@ -17,10 +17,10 @@ internal class CardRepositoryImpl(
     private var isInLocalStorage = false
 
     override fun getArticleByArtistName(artistName: String): List<Card> {
-        val cardsArticles = cardLocalStorage.getCards(artistName)
-
+        var cardsArticles = cardLocalStorage.getCards(artistName)
         if (!isInLocalStorage) {
-            cardLocalStorage.saveCards(artistName, broker.getCards(artistName))
+            cardsArticles = broker.getCards(artistName)
+            cardLocalStorage.saveCards(artistName, cardsArticles)
         } else {
             cardsArticles.forEach {
                 setStorage(it)

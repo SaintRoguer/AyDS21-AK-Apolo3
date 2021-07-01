@@ -1,13 +1,10 @@
 package ayds.apolo.songinfo.moredetails.view
 
-import ayds.apolo.songinfo.moredetails.model.entities.Source
+import ayds.apolo.songinfo.moredetails.model.entities.Card
 
 data class MoreDetailsUiState(
     val artistName: String = "",
-    val cardURL: String = "",
-    val cardInfo: String = "",
-    var sourceLogoURL: String = "",
-    var sourceLabel: Source = Source.NO
+    var cards: List<Card> = listOf()
 )
 
 

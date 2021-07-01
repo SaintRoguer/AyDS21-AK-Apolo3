@@ -7,13 +7,18 @@ import ayds.apolo.songinfo.moredetails.model.entities.Source
 import ayds.apolo3.lastfm.Article
 import ayds.apolo3.lastfm.ArtistArticle
 import ayds.apolo3.lastfm.LastFMInfoService
+import java.lang.Exception
 
 internal class LastFMProxy(
     private val lastFMInfoService: LastFMInfoService
 ) : Proxy {
 
     override fun getCard(artistName: String): Card =
-        initFullCard(callService(artistName))
+        try {
+            initFullCard(callService(artistName))
+        } catch (e: Exception) {
+            EmptyCard
+        }
 
     private fun callService(artistName: String) =
         lastFMInfoService.getCardInfo(artistName)
@@ -26,6 +31,6 @@ internal class LastFMProxy(
                 Source.LAST_FM,
                 article.sourceLogoURL
             )
-            else ->EmptyCard
+            else -> EmptyCard
         }
 }

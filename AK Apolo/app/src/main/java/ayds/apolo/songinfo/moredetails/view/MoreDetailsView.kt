@@ -19,16 +19,13 @@ import ayds.observer.Observable
 import ayds.observer.Subject
 
 private const val ARTIST_NAME = "artistName"
-private const val STORE_LETTER = "*\n\n"
 
 interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
     val uiStateService: MoreDetailsUiState
 
-    fun updateCard(card: Card)
+    fun updateCard(cards: List<Card>)
     fun openCardURLActivity()
-    fun updateUrl(url: String)
-    fun changeCard(sourceLabel: Source)
 }
 
 class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
@@ -46,10 +43,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var imageView: ImageView
     private lateinit var spinnerSource: Spinner
     private lateinit var sourceInfoPane: TextView
-
-    override fun updateUrl(url: String) {
-        uiStateService = uiStateService.copy(cardURL = url)
-    }
+    private var indexSpinner = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,13 +82,10 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun initSpinner(list: List<Card>) {
         listOfCards = list
         val spinnerNames: MutableList<String> = mutableListOf()
-
         for (card in listOfCards) {
             if (card is FullCard)
-
                 spinnerNames.add(card.source.name)
         }
-        Log.e("CARTA","Size: "+listOfCards.size)
         if (spinnerNames.isNotEmpty())
             runOnUiThread {
                 spinnerSource.adapter =
@@ -116,10 +107,12 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
                 position: Int,
                 id: Long
             ) {
-                updateCard(listOfCards[position])
+                indexSpinner = position
+                updateCard(listOfCards)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                updateCard(listOfCards.first())
+                updateCard(listOfCards)
             }
         }
     }
@@ -131,7 +124,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     override fun openCardURLActivity() {
-        openExternalUrl(uiStateService.cardURL)
+        openExternalUrl(uiStateService.cards[indexSpinner].infoURL)
     }
 
     private fun initObservers() {
@@ -145,55 +138,29 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullCard)
     }
 
-    override fun updateCard(card: Card) {
-        updateUiState(card)
+    override fun updateCard(cards: List<Card>) {
+        updateUiState(cards)
         updateArtistInfoUI()
     }
 
-    private fun updateUiState(card: Card) {
-        when (card) {
-            is EmptyCard -> updateNoResultsUiState()
-            else -> updateCardUiState(card)
+    private fun updateUiState(cards: List<Card>) {
+        when {
+            cards.isEmpty() -> updateNoResultsUiState()
+            else -> updateCardUiState(cards)
         }
     }
 
-    private fun updateCardUiState(card: Card) {
-        when (card.isLocallyStoraged) {
-            true -> updateStoredCardUiState(card)
-            else -> updateNewCardUiState(card)
-        }
+    private fun updateCardUiState(cards: List<Card>) {
+        updateStoredCardUiState(cards)
     }
 
-    override fun changeCard(sourceLabel: Source) {
-        listOfCards.forEach {
-            if (it.source == sourceLabel)
-                updateCard(it)
-        }
-    }
 
-    private fun updateStoredCardUiState(card: Card) {
-        uiStateService = uiStateService.copy(
-            cardURL = card.infoURL,
-            cardInfo = STORE_LETTER.plus(card.description),
-            sourceLogoURL = card.sourceLogoURL,
-            sourceLabel = card.source,
-        )
-    }
-
-    private fun updateNewCardUiState(card: Card) {
-        uiStateService = uiStateService.copy(
-            cardURL = card.infoURL,
-            cardInfo = card.description,
-            sourceLogoURL = card.sourceLogoURL,
-            sourceLabel = card.source
-        )
+    private fun updateStoredCardUiState(cards: List<Card>) {
+        uiStateService.cards = cards
     }
 
     private fun updateNoResultsUiState() {
-        uiStateService = uiStateService.copy(
-            cardURL = "",
-            cardInfo = "Data not found!"
-        )
+        uiStateService.cards = listOf()
     }
 
     private fun updateArtistInfoUI() {
@@ -205,17 +172,23 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun loadLastImage() {
-        UtilsModule.imageLoader.loadImageIntoView(uiStateService.sourceLogoURL, imageView)
+        UtilsModule.imageLoader.loadImageIntoView(
+            uiStateService.cards[indexSpinner].sourceLogoURL,
+            imageView
+        )
     }
 
     private fun loadArtistInfo() {
         moreDetailsPane.text = Html.fromHtml(
-            helperCardInfo.getTextToHtml(uiStateService.cardInfo, uiStateService.artistName)
+            helperCardInfo.getTextToHtml(
+                uiStateService.cards[indexSpinner].description,
+                uiStateService.artistName
+            )
         )
     }
 
     private fun loadSourceInfo() {
-        sourceInfoPane.text = "FROM: " + uiStateService.sourceLabel.toString()
+        sourceInfoPane.text = "FROM: " + uiStateService.cards[indexSpinner].source.toString()
     }
 
     companion object {

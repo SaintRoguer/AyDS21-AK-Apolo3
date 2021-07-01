@@ -1,6 +1,7 @@
 package ayds.apolo.songinfo.moredetails.model
 
 import android.content.Context
+import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.repository.CardRepository
 import ayds.apolo.songinfo.moredetails.model.repository.CardRepositoryImpl
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
