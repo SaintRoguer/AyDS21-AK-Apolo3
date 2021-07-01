@@ -25,7 +25,6 @@ internal class MoreDetailsControllerImpl(
             when (value) {
                 MoreDetailsUiEvent.ViewFullCard -> viewFullCard()
                 MoreDetailsUiEvent.OnCreated -> searchCard()
-                MoreDetailsUiEvent.ShowSelectedCard -> showSelected()
             }
         }
 
@@ -39,7 +38,4 @@ internal class MoreDetailsControllerImpl(
         moreDetailsView.openCardURLActivity()
     }
 
-    private fun showSelected(){
-        moreDetailsView.changeCard(moreDetailsView.uiStateService.sourceLabel)
-    }
 }

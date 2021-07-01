@@ -46,8 +46,8 @@ internal class CardRepositoryImpl(
 
     private fun checkAnyFullCard(cardsArticles: List<Card>): Boolean {
         var allFullCards = false
-        for (cardsArticle in cardsArticles) {
-            if (cardsArticle is FullCard)
+        for (cardArticle in cardsArticles) {
+            if (cardArticle is FullCard)
                 allFullCards = true
         }
         return allFullCards
