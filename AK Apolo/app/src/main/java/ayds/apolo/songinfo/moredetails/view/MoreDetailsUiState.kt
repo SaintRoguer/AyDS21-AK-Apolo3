@@ -11,6 +11,6 @@ data class MoreDetailsUiState(
 
     companion object {
         const val IMAGE_NO_RESULTS_URL =
-            "https://i.pinimg.com/originals/6a/6d/11/6a6d1124cf69e5588588bc7e397598f6.png"
+            "https://i.imgur.com/97QT1wn.png"
     }
 }

@@ -167,11 +167,11 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun updateUiState(cards: List<Card>) {
         when {
             cards.isEmpty() -> updateNoResultsUiState()
-            else -> updateStoredCardUiState(cards)
+            else -> updateResultsUiState(cards)
         }
     }
 
-    private fun updateStoredCardUiState(cards: List<Card>) {
+    private fun updateResultsUiState(cards: List<Card>) {
         uiStateService.cards = cards
     }
 
