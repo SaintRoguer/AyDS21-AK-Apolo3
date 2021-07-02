@@ -3,16 +3,13 @@ package ayds.apolo.songinfo.moredetails.view
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.View
 import android.widget.*
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Card
-import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
-import ayds.apolo.songinfo.moredetails.model.entities.FullCard
-import ayds.apolo.songinfo.moredetails.model.entities.Source
+import ayds.apolo.songinfo.moredetails.model.entities.NoResultsCard
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.observer.Observable
@@ -39,7 +36,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     override var uiStateService: MoreDetailsUiState = MoreDetailsUiState()
 
     private lateinit var moreDetailsPane: TextView
-    private lateinit var moreDetailsButton: Button
+    private lateinit var openURLButton: Button
     private lateinit var imageView: ImageView
     private lateinit var spinnerSource: Spinner
     private lateinit var sourceInfoPane: TextView
@@ -52,9 +49,14 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         initModule()
         initProperties()
         initArtistName()
-        initListeners()
         initObservers()
+        initListeners()
         notifyCreated()
+    }
+
+    private fun initListeners() {
+        initURLButtonListener()
+        initSpinnerListener()
     }
 
     private fun notifyCreated() {
@@ -68,7 +70,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun initProperties() {
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
-        moreDetailsButton = findViewById(R.id.openUrlButton)
+        openURLButton = findViewById(R.id.openUrlButton)
         imageView = findViewById(R.id.imageView)
         sourceInfoPane = findViewById(R.id.sourceLabel)
         spinnerSource = findViewById(R.id.spinner)
@@ -83,19 +85,38 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         listOfCards = list
         val spinnerNames: MutableList<String> = mutableListOf()
         for (card in listOfCards) {
-            if (card is FullCard)
-                spinnerNames.add(card.source.name)
+            spinnerNames.add(card.source.service)
         }
-        if (spinnerNames.isNotEmpty())
-            runOnUiThread {
-                spinnerSource.adapter =
-                    ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerNames)
-            }
+        if (spinnerNames.isEmpty()) {
+            addNoResultsCard(spinnerNames)
+            setDisabledAction()
+            updateMoreDetailsState()
+        }
+
+        runOnUiThread {
+            spinnerSource.adapter =
+                ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerNames)
+        }
     }
 
-    private fun initListeners() {
-        initSpinnerListener()
-        initURLButtonListener()
+    private fun addNoResultsCard(spinnerNames: MutableList<String>){
+        listOfCards = mutableListOf(NoResultsCard)
+        spinnerNames.add(NoResultsCard.source.service)
+    }
+
+    private fun setDisabledAction() {
+        uiStateService = uiStateService.copy(actionsEnabled = false)
+    }
+
+    private fun updateMoreDetailsState() {
+        enableActions(uiStateService.actionsEnabled)
+    }
+
+    private fun enableActions(enable: Boolean) {
+        runOnUiThread {
+            openURLButton.isEnabled = enable
+            spinnerSource.isEnabled = enable
+        }
     }
 
     private fun initSpinnerListener() {
@@ -118,7 +139,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun initURLButtonListener() {
-        moreDetailsButton.setOnClickListener {
+        openURLButton.setOnClickListener {
             notifyFullCardAction()
         }
     }
@@ -146,14 +167,9 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun updateUiState(cards: List<Card>) {
         when {
             cards.isEmpty() -> updateNoResultsUiState()
-            else -> updateCardUiState(cards)
+            else -> updateStoredCardUiState(cards)
         }
     }
-
-    private fun updateCardUiState(cards: List<Card>) {
-        updateStoredCardUiState(cards)
-    }
-
 
     private fun updateStoredCardUiState(cards: List<Card>) {
         uiStateService.cards = cards
@@ -188,7 +204,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun loadSourceInfo() {
-        sourceInfoPane.text = "FROM: " + uiStateService.cards[indexSpinner].source.toString()
+        sourceInfoPane.text = "FROM: " + uiStateService.cards[indexSpinner].source.service
     }
 
     companion object {

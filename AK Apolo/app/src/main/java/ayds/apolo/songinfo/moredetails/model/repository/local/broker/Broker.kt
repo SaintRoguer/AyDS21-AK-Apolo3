@@ -1,6 +1,7 @@
 package ayds.apolo.songinfo.moredetails.model.repository.local.broker
 
 import ayds.apolo.songinfo.moredetails.model.entities.Card
+import ayds.apolo.songinfo.moredetails.model.entities.FullCard
 
 interface IBroker {
     fun getCards(artistName: String): List<Card>
@@ -14,7 +15,9 @@ internal class Broker(
 
     override fun getCards(artistName: String): List<Card> {
         proxies.forEach {
-            cards.add(it.getCard(artistName))
+            if(it.getCard(artistName) is FullCard){
+                cards.add(it.getCard(artistName))
+            }
         }
         return cards
     }
