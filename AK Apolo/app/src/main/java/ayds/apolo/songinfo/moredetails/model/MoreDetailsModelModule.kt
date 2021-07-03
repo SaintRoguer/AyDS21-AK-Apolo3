@@ -1,11 +1,10 @@
 package ayds.apolo.songinfo.moredetails.model
 
 import android.content.Context
-import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.repository.CardRepository
 import ayds.apolo.songinfo.moredetails.model.repository.CardRepositoryImpl
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
-import ayds.apolo.songinfo.moredetails.model.repository.local.broker.Broker
+import ayds.apolo.songinfo.moredetails.model.repository.local.broker.BrokerImpl
 import ayds.apolo.songinfo.moredetails.model.repository.local.broker.LastFMProxy
 import ayds.apolo.songinfo.moredetails.model.repository.local.broker.NewYorkProxy
 import ayds.apolo.songinfo.moredetails.model.repository.local.broker.WikipediaProxy
@@ -27,7 +26,7 @@ object MoreDetailsModelModule {
         val newYorkProxy = NewYorkProxy(NYTModule.nytArticleService)
         val lastFMProxy = LastFMProxy(LastFMModule.lastFMInfoService)
         val wikipediaProxy = WikipediaProxy(WikipediaModule.wikipediaService)
-        val broker = Broker(listOf(lastFMProxy, newYorkProxy, wikipediaProxy))
+        val broker = BrokerImpl(listOf(lastFMProxy, newYorkProxy, wikipediaProxy))
 
         val artistLocalStorage: CardLocalStorage = CardLocalStorageImpl(
             moreDetailsView as Context, CursorToLastFMSongMapperImpl()
