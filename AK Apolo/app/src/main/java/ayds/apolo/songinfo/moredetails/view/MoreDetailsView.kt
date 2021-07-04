@@ -2,9 +2,9 @@ package ayds.apolo.songinfo.moredetails.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Html
 import android.view.View
 import android.widget.*
+import androidx.core.text.HtmlCompat
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
@@ -30,17 +30,19 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private val onActionSubject = Subject<MoreDetailsUiEvent>()
     private lateinit var moreDetailsModel: MoreDetailsModel
     private val helperCardInfo = MoreDetailsViewModule.helperCardInfo
-    private lateinit var listOfCards: List<Card>
+
 
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiStateService: MoreDetailsUiState = MoreDetailsUiState()
+
+    private var listOfCards = uiStateService.cards
 
     private lateinit var moreDetailsPane: TextView
     private lateinit var openURLButton: Button
     private lateinit var imageView: ImageView
     private lateinit var spinnerSource: Spinner
     private lateinit var sourceInfoPane: TextView
-    private var indexSpinner = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +54,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         initObservers()
         initListeners()
         notifyCreated()
+
     }
 
     private fun initListeners() {
@@ -81,37 +84,6 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
             uiStateService.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
     }
 
-    private fun initSpinner(list: List<Card>) {
-        listOfCards = list
-        val spinnerNames: MutableList<String> = mutableListOf()
-        for (card in listOfCards) {
-            spinnerNames.add(card.source.service)
-        }
-        if (spinnerNames.isEmpty()) {
-            addNoResultsCard(spinnerNames)
-            setDisabledAction()
-            updateMoreDetailsState()
-        }
-
-        runOnUiThread {
-            spinnerSource.adapter =
-                ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerNames)
-        }
-    }
-
-    private fun addNoResultsCard(spinnerNames: MutableList<String>){
-        listOfCards = mutableListOf(NoResultsCard)
-        spinnerNames.add(NoResultsCard.source.service)
-    }
-
-    private fun setDisabledAction() {
-        uiStateService = uiStateService.copy(actionsEnabled = false)
-    }
-
-    private fun updateMoreDetailsState() {
-        enableActions(uiStateService.actionsEnabled)
-    }
-
     private fun enableActions(enable: Boolean) {
         runOnUiThread {
             openURLButton.isEnabled = enable
@@ -128,7 +100,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
                 position: Int,
                 id: Long
             ) {
-                indexSpinner = position
+                uiStateService = uiStateService.copy(indexSpinner = position)
                 updateCard(listOfCards)
             }
 
@@ -145,14 +117,47 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     override fun openCardURLActivity() {
-        openExternalUrl(uiStateService.cards[indexSpinner].infoURL)
+        val card = uiStateService.getCurrentCard()
+        openExternalUrl(card.infoURL)
     }
 
     private fun initObservers() {
         moreDetailsModel.cardObservable()
             .subscribe { value ->
-                initSpinner(value)
+                run {
+                    uiStateService = uiStateService.copy(cards = value)
+                    initSpinner()
+                }
             }
+    }
+
+    private fun initSpinner() {
+        listOfCards = uiStateService.cards
+        val spinnerNames: MutableList<String> = mutableListOf()
+        spinnerNames.addAll(listOfCards.map { it.source.service })
+        if (spinnerNames.isEmpty()) {
+            addNoResultsCard(spinnerNames)
+            setDisabledAction()
+            updateMoreDetailsState()
+        }
+
+        runOnUiThread {
+            spinnerSource.adapter =
+                ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerNames)
+        }
+    }
+
+    private fun addNoResultsCard(spinnerNames: MutableList<String>) {
+        listOfCards = mutableListOf(NoResultsCard)
+        spinnerNames.add(NoResultsCard.source.service)
+    }
+
+    private fun setDisabledAction() {
+        uiStateService = uiStateService.copy(actionsEnabled = false)
+    }
+
+    private fun updateMoreDetailsState() {
+        enableActions(uiStateService.actionsEnabled)
     }
 
     private fun notifyFullCardAction() {
@@ -181,30 +186,31 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateArtistInfoUI() {
         runOnUiThread {
-            loadLastImage()
+            loadServiceImage()
             loadArtistInfo()
             loadSourceInfo()
         }
     }
 
-    private fun loadLastImage() {
+    private fun loadServiceImage() {
         UtilsModule.imageLoader.loadImageIntoView(
-            uiStateService.cards[indexSpinner].sourceLogoURL,
+            uiStateService.cards[uiStateService.indexSpinner].sourceLogoURL,
             imageView
         )
     }
 
     private fun loadArtistInfo() {
-        moreDetailsPane.text = Html.fromHtml(
+        moreDetailsPane.text = HtmlCompat.fromHtml(
             helperCardInfo.getTextToHtml(
-                uiStateService.cards[indexSpinner].description,
+                uiStateService.cards[uiStateService.indexSpinner].description,
                 uiStateService.artistName
-            )
+            ), HtmlCompat.FROM_HTML_MODE_LEGACY
         )
     }
 
     private fun loadSourceInfo() {
-        sourceInfoPane.text = "FROM: " + uiStateService.cards[indexSpinner].source.service
+        val source = "FROM: " + uiStateService.cards[uiStateService.indexSpinner].source.service
+        sourceInfoPane.text = source
     }
 
     companion object {

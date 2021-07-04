@@ -3,13 +3,13 @@ package ayds.apolo.songinfo.moredetails.model.repository.local.broker
 import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.FullCard
 
-interface IBroker {
+interface Broker {
     fun getCards(artistName: String): List<Card>
 }
 
-internal class Broker(
+internal class BrokerImpl(
     private val proxies: List<Proxy>
-) : IBroker {
+) : Broker {
 
     private var cards: MutableList<Card> = mutableListOf()
 

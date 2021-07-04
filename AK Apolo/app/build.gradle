@@ -30,16 +30,12 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildFeatures {
-        viewBinding true
-    }
 }
 
 dependencies {
 
     implementation project(":observer")
     implementation project(":lastfmdata")
-
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
@@ -54,9 +50,6 @@ dependencies {
     implementation 'androidx.sqlite:sqlite-ktx:2.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation project(path: ':nytimesdata')
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation project(path: ':wikipediadata')
 
     testImplementation 'junit:junit:4.+'

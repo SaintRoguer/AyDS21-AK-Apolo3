@@ -6,8 +6,10 @@ data class MoreDetailsUiState(
     val artistName: String = "",
     val actionsEnabled: Boolean = true,
     var cards: List<Card> = listOf(),
-    val sourceLogo : String = ""
+    val sourceLogo: String = "",
+    var indexSpinner: Int = 0
 ) {
+    fun getCurrentCard(): Card = cards[indexSpinner]
 
     companion object {
         const val IMAGE_NO_RESULTS_URL =
