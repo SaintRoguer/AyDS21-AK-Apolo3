@@ -177,11 +177,11 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun updateResultsUiState(cards: List<Card>) {
-        uiStateService.cards = cards
+        uiStateService = uiStateService.copy(cards = cards)
     }
 
     private fun updateNoResultsUiState() {
-        uiStateService.cards = listOf()
+        uiStateService = uiStateService.copy(cards = listOf())
     }
 
     private fun updateArtistInfoUI() {
@@ -194,7 +194,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun loadServiceImage() {
         UtilsModule.imageLoader.loadImageIntoView(
-            uiStateService.cards[uiStateService.indexSpinner].sourceLogoURL,
+            uiStateService.getCurrentCard().sourceLogoURL,
             imageView
         )
     }
@@ -202,14 +202,14 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun loadArtistInfo() {
         moreDetailsPane.text = HtmlCompat.fromHtml(
             helperCardInfo.getTextToHtml(
-                uiStateService.cards[uiStateService.indexSpinner].description,
+                uiStateService.getCurrentCard().description,
                 uiStateService.artistName
             ), HtmlCompat.FROM_HTML_MODE_LEGACY
         )
     }
 
     private fun loadSourceInfo() {
-        val source = "FROM: " + uiStateService.cards[uiStateService.indexSpinner].source.service
+        val source = "FROM: " + uiStateService.getCurrentCard().source.service
         sourceInfoPane.text = source
     }
 
