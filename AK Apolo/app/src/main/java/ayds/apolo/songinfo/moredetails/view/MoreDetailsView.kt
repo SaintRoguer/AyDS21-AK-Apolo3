@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
@@ -161,7 +160,6 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         runOnUiThread {
             openURLButton.isEnabled = uiStateService.actionsEnabled
             spinnerSource.isEnabled = uiStateService.actionsEnabled
-            progressBar.isGone = uiStateService.actionsEnabled
         }
     }
 
@@ -176,17 +174,31 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun updateUiState(cards: List<Card>) {
         when {
-            cards.isEmpty() -> updateNoResultsUiState()
+            cards.contains(NoResultsCard) -> updateNoResultsUiState(cards)
             else -> updateResultsUiState(cards)
         }
     }
 
     private fun updateResultsUiState(cards: List<Card>) {
         uiStateService = uiStateService.copy(cards = cards)
+        setEnabledAction()
+        setProgressBarWithResults()
+        updateActions()
     }
 
-    private fun updateNoResultsUiState() {
-        uiStateService = uiStateService.copy(cards = listOf())
+    private fun updateNoResultsUiState(cards: List<Card>) {
+        uiStateService = uiStateService.copy(cards = cards)
+        setDisabledAction()
+        setProgressBarWithNoResults()
+        updateActions()
+    }
+
+    private fun setProgressBarWithResults(){
+        progressBar.isVisible = !(uiStateService.actionsEnabled)
+    }
+
+    private fun setProgressBarWithNoResults(){
+        progressBar.isVisible = uiStateService.actionsEnabled
     }
 
     private fun updateArtistInfoUI() {
@@ -194,8 +206,6 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
             loadServiceImage()
             loadArtistInfo()
             loadSourceInfo()
-            setEnabledAction()
-            updateActions()
         }
     }
 
