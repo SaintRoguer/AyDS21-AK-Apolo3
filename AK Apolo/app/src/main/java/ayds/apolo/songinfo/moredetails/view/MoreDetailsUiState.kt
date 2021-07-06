@@ -4,7 +4,7 @@ import ayds.apolo.songinfo.moredetails.model.entities.Card
 
 data class MoreDetailsUiState(
     val artistName: String = "",
-    val actionsEnabled: Boolean = true,
+    val actionsEnabled: Boolean = false,
     var cards: List<Card> = listOf(),
     val sourceLogo: String = "",
     var indexSpinner: Int = 0

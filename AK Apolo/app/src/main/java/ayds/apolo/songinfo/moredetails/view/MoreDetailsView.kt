@@ -54,7 +54,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         initObservers()
         initListeners()
         notifyCreated()
-
+        updateActions()
     }
 
     private fun initListeners() {
@@ -82,13 +82,6 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private fun initArtistName() {
         uiStateService =
             uiStateService.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
-    }
-
-    private fun enableActions(enable: Boolean) {
-        runOnUiThread {
-            openURLButton.isEnabled = enable
-            spinnerSource.isEnabled = enable
-        }
     }
 
     private fun initSpinnerListener() {
@@ -138,7 +131,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         if (spinnerNames.isEmpty()) {
             addNoResultsCard(spinnerNames)
             setDisabledAction()
-            updateMoreDetailsState()
+            updateActions()
         }
 
         runOnUiThread {
@@ -156,8 +149,15 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         uiStateService = uiStateService.copy(actionsEnabled = false)
     }
 
-    private fun updateMoreDetailsState() {
-        enableActions(uiStateService.actionsEnabled)
+    private fun setEnabledAction() {
+        uiStateService = uiStateService.copy(actionsEnabled = true)
+    }
+
+    private fun updateActions() {
+        runOnUiThread {
+            openURLButton.isEnabled = uiStateService.actionsEnabled
+            spinnerSource.isEnabled = uiStateService.actionsEnabled
+        }
     }
 
     private fun notifyFullCardAction() {
@@ -189,6 +189,8 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
             loadServiceImage()
             loadArtistInfo()
             loadSourceInfo()
+            setEnabledAction()
+            updateActions()
         }
     }
 
