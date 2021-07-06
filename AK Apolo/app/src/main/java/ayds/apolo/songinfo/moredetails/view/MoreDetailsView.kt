@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
@@ -42,6 +44,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var imageView: ImageView
     private lateinit var spinnerSource: Spinner
     private lateinit var sourceInfoPane: TextView
+    private lateinit var progressBar: ProgressBar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +80,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         imageView = findViewById(R.id.imageView)
         sourceInfoPane = findViewById(R.id.sourceLabel)
         spinnerSource = findViewById(R.id.spinner)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun initArtistName() {
@@ -157,6 +161,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         runOnUiThread {
             openURLButton.isEnabled = uiStateService.actionsEnabled
             spinnerSource.isEnabled = uiStateService.actionsEnabled
+            progressBar.isGone = uiStateService.actionsEnabled
         }
     }
 
