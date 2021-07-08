@@ -1,54 +1,51 @@
 package ayds.apolo.songinfo.moredetails.model.repository
 
-import android.util.Log
 import ayds.apolo.songinfo.moredetails.model.entities.*
-import ayds.apolo3.lastfm.LastFMInfoService
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
-import ayds.apolo3.lastfm.Article
-
+import ayds.apolo.songinfo.moredetails.model.repository.external.broker.BrokerImpl
 
 interface CardRepository {
-    fun getArticleByArtistName(artistName: String): Card
+    fun getArticleByArtistName(artistName: String): List<Card>
 }
+
+private const val STORE_LETTER = "*\n\n"
 
 internal class CardRepositoryImpl(
     private val cardLocalStorage: CardLocalStorage,
-    private val lastFMInfoService: LastFMInfoService,
+    private val brokerImpl: BrokerImpl
 ) : CardRepository {
 
-    override fun getArticleByArtistName(artistName: String): Card {
-        var cardArticle = cardLocalStorage.getCard(artistName)
-        when {
+    override fun getArticleByArtistName(artistName: String): List<Card> {
+        var cardsArticles = cardLocalStorage.getCards(artistName)
 
-            cardArticle != null -> cardInLocalStorage(cardArticle)
-            else -> {
-                try {
-                    val serviceCard = lastFMInfoService.getCardInfo(artistName)
+        if (cardsArticles.isEmpty()) {
+            cardsArticles = brokerImpl.getCards(artistName)
+            cardLocalStorage.saveCards(artistName, cardsArticles)
+        } else {
 
-                    serviceCard?.let {
-                        cardArticle = initFullCard(it)
-                    }
-
-                    cardArticle?.let {
-                        cardLocalStorage.saveCard(artistName, it)
-                    }
-                } catch (e: Exception) {
-                    Log.e("Artist Article", "ERROR: $e")
-                }
+            cardsArticles.forEach {
+                setStorage(it)
             }
         }
-        return cardArticle ?: EmptyCard
+
+        return when (checkAnyFullCard(cardsArticles)) {
+            true -> cardsArticles
+            false -> listOf()
+        }
     }
 
-    private fun cardInLocalStorage(cardArticle: FullCard) {
+    private fun setStorage(cardArticle: Card) {
+        if (cardArticle is FullCard) {
+            cardInLocalStorage(cardArticle)
+        }
+    }
+
+    private fun cardInLocalStorage(cardArticle: Card) {
         cardArticle.isLocallyStoraged = true
+        cardArticle.description = STORE_LETTER.plus(cardArticle.description)
     }
 
-    private fun initFullCard(article: Article) =
-        FullCard(
-            article.description,
-            article.infoURL,
-            Source.LAST_FM,
-            article.sourceLogoURL
-        )
+    private fun checkAnyFullCard(cardsArticles: List<Card>): Boolean =
+        cardsArticles.any { it is FullCard }
+
 }

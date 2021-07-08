@@ -2,30 +2,28 @@ package ayds.apolo.songinfo.moredetails.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Html
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.View
+import android.widget.*
+import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
 import ayds.apolo.songinfo.moredetails.model.entities.Card
-import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
+import ayds.apolo.songinfo.moredetails.model.entities.NoResultsCard
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
 import ayds.observer.Observable
 import ayds.observer.Subject
 
 private const val ARTIST_NAME = "artistName"
-private const val STORE_LETTER = "*\n\n"
 
 interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
-    val uiState: MoreDetailsUiState
+    val uiStateService: MoreDetailsUiState
 
-    fun updateCard(card: Card)
+    fun updateCard(cards: List<Card>)
     fun openCardURLActivity()
-    fun updateUrl(url: String)
 }
 
 class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
@@ -34,18 +32,19 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     private lateinit var moreDetailsModel: MoreDetailsModel
     private val helperCardInfo = MoreDetailsViewModule.helperCardInfo
 
+
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
-    override var uiState: MoreDetailsUiState = MoreDetailsUiState()
+    override var uiStateService: MoreDetailsUiState = MoreDetailsUiState()
+
+    private var listOfCards = uiStateService.cards
 
     private lateinit var moreDetailsPane: TextView
-    private lateinit var moreDetailsButton: Button
+    private lateinit var openURLButton: Button
     private lateinit var imageView: ImageView
-
+    private lateinit var spinnerSource: Spinner
     private lateinit var sourceInfoPane: TextView
+    private lateinit var progressBar: ProgressBar
 
-    override fun updateUrl(url: String) {
-        uiState = uiState.copy(cardURL = url)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +53,15 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         initModule()
         initProperties()
         initArtistName()
-        initListeners()
         initObservers()
+        initListeners()
         notifyCreated()
+        updateActions()
+    }
+
+    private fun initListeners() {
+        initURLButtonListener()
+        initSpinnerListener()
     }
 
     private fun notifyCreated() {
@@ -70,104 +75,159 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
 
     private fun initProperties() {
         moreDetailsPane = findViewById(R.id.moreDetailsPane)
-        moreDetailsButton = findViewById(R.id.openUrlButton)
+        openURLButton = findViewById(R.id.openUrlButton)
         imageView = findViewById(R.id.imageView)
         sourceInfoPane = findViewById(R.id.sourceLabel)
+        spinnerSource = findViewById(R.id.spinner)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun initArtistName() {
-        uiState = uiState.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
+        uiStateService =
+            uiStateService.copy(artistName = intent.getStringExtra(ARTIST_NAME_EXTRA).toString())
     }
 
-    private fun initListeners() {
-        initURLButtonListener()
+    private fun initSpinnerListener() {
+        spinnerSource.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                uiStateService = uiStateService.copy(indexSpinner = position)
+                updateCard(listOfCards)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                updateCard(listOfCards)
+            }
+        }
     }
 
     private fun initURLButtonListener() {
-        moreDetailsButton.setOnClickListener {
+        openURLButton.setOnClickListener {
             notifyFullCardAction()
         }
     }
 
     override fun openCardURLActivity() {
-        openExternalUrl(uiState.cardURL)
+        val card = uiStateService.getCurrentCard()
+        openExternalUrl(card.infoURL)
     }
 
     private fun initObservers() {
         moreDetailsModel.cardObservable()
             .subscribe { value ->
-                updateCard(value)
+                run {
+                    uiStateService = uiStateService.copy(cards = value)
+                    initSpinner()
+                }
             }
+    }
+
+    private fun initSpinner() {
+        listOfCards = uiStateService.cards
+        val spinnerNames: MutableList<String> = mutableListOf()
+        spinnerNames.addAll(listOfCards.map { it.source.service })
+        if (spinnerNames.isEmpty()) {
+            addNoResultsCard(spinnerNames)
+            setDisabledAction()
+            updateActions()
+        }
+
+        runOnUiThread {
+            spinnerSource.adapter =
+                ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerNames)
+        }
+    }
+
+    private fun addNoResultsCard(spinnerNames: MutableList<String>) {
+        listOfCards = mutableListOf(NoResultsCard)
+        spinnerNames.add(NoResultsCard.source.service)
+    }
+
+    private fun setDisabledAction() {
+        uiStateService = uiStateService.copy(actionsEnabled = false)
+    }
+
+    private fun setEnabledAction() {
+        uiStateService = uiStateService.copy(actionsEnabled = true)
+    }
+
+    private fun updateActions() {
+        runOnUiThread {
+            openURLButton.isEnabled = uiStateService.actionsEnabled
+            spinnerSource.isEnabled = uiStateService.actionsEnabled
+        }
     }
 
     private fun notifyFullCardAction() {
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullCard)
     }
 
-    override fun updateCard(card: Card) {
-        updateUiState(card)
+    override fun updateCard(cards: List<Card>) {
+        updateUiState(cards)
         updateArtistInfoUI()
     }
 
-    private fun updateUiState(card: Card) {
-        when (card) {
-            is EmptyCard -> updateNoResultsUiState()
-            else -> updateCardUiState(card)
+    private fun updateUiState(cards: List<Card>) {
+        when {
+            cards.contains(NoResultsCard) -> updateNoResultsUiState(cards)
+            else -> updateResultsUiState(cards)
         }
     }
 
-    private fun updateCardUiState(card: Card) {
-        when (card.isLocallyStoraged) {
-            true -> updateStoredCardUiState(card)
-            else -> updateNewCardUiState(card)
-        }
+    private fun updateResultsUiState(cards: List<Card>) {
+        uiStateService = uiStateService.copy(cards = cards)
+        setEnabledAction()
+        setProgressBarWithResults()
+        updateActions()
     }
 
-    private fun updateStoredCardUiState(card: Card) {
-        uiState = uiState.copy(
-            cardURL = card.infoURL,
-            cardInfo = STORE_LETTER.plus(card.description),
-            sourceLogoURL = card.sourceLogoURL,
-            sourceLabel = card.source
-        )
+    private fun updateNoResultsUiState(cards: List<Card>) {
+        uiStateService = uiStateService.copy(cards = cards)
+        setDisabledAction()
+        setProgressBarWithNoResults()
+        updateActions()
     }
 
-    private fun updateNewCardUiState(card: Card) {
-        uiState = uiState.copy(
-            cardURL = card.infoURL,
-            cardInfo = card.description,
-            sourceLogoURL = card.sourceLogoURL,
-            sourceLabel = card.source
-        )
+    private fun setProgressBarWithResults(){
+        progressBar.isVisible = !(uiStateService.actionsEnabled)
     }
 
-    private fun updateNoResultsUiState() {
-        uiState = uiState.copy(
-            cardURL = "",
-            cardInfo = "Información no encontrada!"
-        )
+    private fun setProgressBarWithNoResults(){
+        progressBar.isVisible = uiStateService.actionsEnabled
     }
 
     private fun updateArtistInfoUI() {
         runOnUiThread {
-            loadLastFMImage()
+            loadServiceImage()
             loadArtistInfo()
             loadSourceInfo()
         }
     }
 
-    private fun loadLastFMImage() {
-        UtilsModule.imageLoader.loadImageIntoView(uiState.sourceLogoURL, imageView)
-    }
-
-    private fun loadArtistInfo() {
-        moreDetailsPane.text = Html.fromHtml(
-            helperCardInfo.getTextToHtml(uiState.cardInfo, uiState.artistName)
+    private fun loadServiceImage() {
+        UtilsModule.imageLoader.loadImageIntoView(
+            uiStateService.getCurrentCard().sourceLogoURL,
+            imageView
         )
     }
 
-    private fun loadSourceInfo(){
-        sourceInfoPane.text = "FROM: "+uiState.sourceLabel.toString()
+    private fun loadArtistInfo() {
+        moreDetailsPane.text = HtmlCompat.fromHtml(
+            helperCardInfo.getTextToHtml(
+                uiStateService.getCurrentCard().description,
+                uiStateService.artistName
+            ), HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+    }
+
+    private fun loadSourceInfo() {
+        val source = "FROM: " + uiStateService.getCurrentCard().source.service
+        sourceInfoPane.text = source
     }
 
     companion object {

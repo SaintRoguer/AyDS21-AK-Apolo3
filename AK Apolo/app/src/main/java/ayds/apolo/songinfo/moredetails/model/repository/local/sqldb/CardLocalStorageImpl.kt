@@ -36,9 +36,11 @@ internal class CardLocalStorageImpl(
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    override fun saveCard(artistName: String, card: Card) {
-        val column = fillDatabaseWithNewRow(artistName,card)
-        this.writableDatabase.insert(CARDS_TABLE, null, column)
+    override fun saveCards(artistName: String, cards: List<Card>){
+        cards.forEach {
+            val column = fillDatabaseWithNewRow(artistName, it)
+            this.writableDatabase.insert(CARDS_TABLE, null, column)
+        }
     }
 
     private fun fillDatabaseWithNewRow(artistName: String, card : Card) =
@@ -50,7 +52,8 @@ internal class CardLocalStorageImpl(
             put(SOURCE_LOGO_COLUMN, card.sourceLogoURL)
         }
 
-    override fun getCard(artistName: String): FullCard? {
+    override fun getCards(artistName: String): List<Card> {
+        val list = mutableListOf<Card>()
         val cursor = readableDatabase.query(
             CARDS_TABLE,
             projection,
@@ -60,6 +63,7 @@ internal class CardLocalStorageImpl(
             null,
             CARD_DESC_COLUMN
         )
-        return cursorToLastFMArtistMapper.map(cursor)
+        cursorToLastFMArtistMapper.map(cursor, list)
+        return list
     }
 }
