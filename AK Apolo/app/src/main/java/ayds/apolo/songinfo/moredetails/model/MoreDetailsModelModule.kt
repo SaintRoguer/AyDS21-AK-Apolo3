@@ -4,10 +4,10 @@ import android.content.Context
 import ayds.apolo.songinfo.moredetails.model.repository.CardRepository
 import ayds.apolo.songinfo.moredetails.model.repository.CardRepositoryImpl
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
-import ayds.apolo.songinfo.moredetails.model.repository.local.broker.BrokerImpl
-import ayds.apolo.songinfo.moredetails.model.repository.local.broker.LastFMProxy
-import ayds.apolo.songinfo.moredetails.model.repository.local.broker.NewYorkProxy
-import ayds.apolo.songinfo.moredetails.model.repository.local.broker.WikipediaProxy
+import ayds.apolo.songinfo.moredetails.model.repository.external.broker.BrokerImpl
+import ayds.apolo.songinfo.moredetails.model.repository.external.broker.LastFMProxy
+import ayds.apolo.songinfo.moredetails.model.repository.external.broker.NewYorkProxy
+import ayds.apolo.songinfo.moredetails.model.repository.external.broker.WikipediaProxy
 import ayds.apolo.songinfo.moredetails.model.repository.local.sqldb.CardLocalStorageImpl
 import ayds.apolo.songinfo.moredetails.view.MoreDetailsView
 import ayds.apolo.songinfo.moredetails.model.repository.local.sqldb.CursorToLastFMSongMapperImpl

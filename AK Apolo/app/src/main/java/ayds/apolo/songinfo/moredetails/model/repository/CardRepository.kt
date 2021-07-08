@@ -2,7 +2,7 @@ package ayds.apolo.songinfo.moredetails.model.repository
 
 import ayds.apolo.songinfo.moredetails.model.entities.*
 import ayds.apolo.songinfo.moredetails.model.repository.local.CardLocalStorage
-import ayds.apolo.songinfo.moredetails.model.repository.local.broker.BrokerImpl
+import ayds.apolo.songinfo.moredetails.model.repository.external.broker.BrokerImpl
 
 interface CardRepository {
     fun getArticleByArtistName(artistName: String): List<Card>

@@ -1,4 +1,4 @@
-package ayds.apolo.songinfo.moredetails.model.repository.local.broker
+package ayds.apolo.songinfo.moredetails.model.repository.external.broker
 
 import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.EmptyCard
