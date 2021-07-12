@@ -9,7 +9,6 @@ import androidx.core.view.isVisible
 import ayds.apolo.songinfo.R
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModel
 import ayds.apolo.songinfo.moredetails.model.MoreDetailsModelModule
-import ayds.apolo.songinfo.moredetails.model.entities.Card
 import ayds.apolo.songinfo.moredetails.model.entities.NoResultsCard
 import ayds.apolo.songinfo.utils.navigation.openExternalUrl
 import ayds.apolo.songinfo.utils.UtilsModule
@@ -22,7 +21,7 @@ interface MoreDetailsView {
     val uiEventObservable: Observable<MoreDetailsUiEvent>
     val uiStateService: MoreDetailsUiState
 
-    fun updateCard(cards: List<Card>)
+    fun updateCard()
     fun openCardURLActivity()
 }
 
@@ -36,15 +35,12 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     override val uiEventObservable: Observable<MoreDetailsUiEvent> = onActionSubject
     override var uiStateService: MoreDetailsUiState = MoreDetailsUiState()
 
-    private var listOfCards = uiStateService.cards
-
     private lateinit var moreDetailsPane: TextView
     private lateinit var openURLButton: Button
     private lateinit var imageView: ImageView
     private lateinit var spinnerSource: Spinner
     private lateinit var sourceInfoPane: TextView
     private lateinit var progressBar: ProgressBar
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,11 +93,11 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
                 id: Long
             ) {
                 uiStateService = uiStateService.copy(indexSpinner = position)
-                updateCard(listOfCards)
+                updateCard()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                updateCard(listOfCards)
+                updateCard()
             }
         }
     }
@@ -128,9 +124,8 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun initSpinner() {
-        listOfCards = uiStateService.cards
         val spinnerNames: MutableList<String> = mutableListOf()
-        spinnerNames.addAll(listOfCards.map { it.source.service })
+        spinnerNames.addAll(uiStateService.cards.map { it.source.service })
         if (spinnerNames.isEmpty()) {
             addNoResultsCard(spinnerNames)
             setDisabledAction()
@@ -144,7 +139,7 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
     }
 
     private fun addNoResultsCard(spinnerNames: MutableList<String>) {
-        listOfCards = mutableListOf(NoResultsCard)
+        uiStateService = uiStateService.copy(cards = mutableListOf(NoResultsCard))
         spinnerNames.add(NoResultsCard.source.service)
     }
 
@@ -167,27 +162,25 @@ class MoreDetailsViewActivity : AppCompatActivity(), MoreDetailsView {
         onActionSubject.notify(MoreDetailsUiEvent.ViewFullCard)
     }
 
-    override fun updateCard(cards: List<Card>) {
-        updateUiState(cards)
+    override fun updateCard() {
+        updateUiState()
         updateArtistInfoUI()
     }
 
-    private fun updateUiState(cards: List<Card>) {
+    private fun updateUiState() {
         when {
-            cards.contains(NoResultsCard) -> updateNoResultsUiState(cards)
-            else -> updateResultsUiState(cards)
+            uiStateService.cards.contains(NoResultsCard) -> updateNoResultsUiState()
+            else -> updateResultsUiState()
         }
     }
 
-    private fun updateResultsUiState(cards: List<Card>) {
-        uiStateService = uiStateService.copy(cards = cards)
+    private fun updateResultsUiState() {
         setEnabledAction()
         setProgressBarWithResults()
         updateActions()
     }
 
-    private fun updateNoResultsUiState(cards: List<Card>) {
-        uiStateService = uiStateService.copy(cards = cards)
+    private fun updateNoResultsUiState() {
         setDisabledAction()
         setProgressBarWithNoResults()
         updateActions()
